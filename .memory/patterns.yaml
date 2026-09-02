@@ -1,0 +1,13 @@
+patterns:
+  determinism:
+    rule: All generative algorithms MUST take an explicit seeded `random.Random` instance.
+    rationale: Prevents implicit global state pollution and ensures bit-exact reproducible runs.
+  serialization:
+    rule: JSON outputs in JSONL files use sorted keys and deterministic sorting by primary key.
+    rationale: Ensures two runs with the same seed yield identical SHA-256 hashes.
+  data_modeling:
+    rule: Use Pydantic models for structured entities, facts, passages, questions, and CLI schemas.
+    rationale: Guarantees strict runtime validation and serialization stability.
+  style_leak_prevention:
+    rule: Identical rendering logic, templates, and neutral filler pools are shared across gold, twin, and distractor passages.
+    rationale: Prevents LLMs from exploiting length, tone, or formatting artifacts to distinguish gold evidence.

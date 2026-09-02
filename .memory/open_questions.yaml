@@ -1,0 +1,3 @@
+open_questions:
+  - Phase 2: What pinned model and revision should be used for SentenceTransformerEmbedder when optional extras are enabled? (HashEmbedder is default in CI).
+  - Phase 3: For the near_miss_entity distractor, what is the fastest deterministic edit-distance calculation to generate variant names?

@@ -1,0 +1,55 @@
+system:
+  name: RAG-Stress
+  description: RAG Hallucination & Retrieval Stress-Test Harness
+  version: "0.1.0"
+  runtime: Python 3.12+
+
+pipeline_stages:
+  kb_generation:
+    owns:
+      - synthetic entity names
+      - structured facts
+      - natural language passage rendering
+      - question generation
+    status: implemented (Phase 1)
+  stress_engine:
+    owns:
+      - distractor synthesis
+      - conflict twins (dated, authority, unresolvable)
+      - position shuffling & opaque doc IDs
+    status: planned (Phase 3)
+  retrieval_stack:
+    owns:
+      - sentence chunking
+      - custom BM25
+      - HashEmbedder & SentenceTransformerEmbedder
+      - FlatStore & QdrantStore
+      - retrieval metrics (Hit@K, Recall@K, Precision@K, MRR, nDCG)
+    status: planned (Phase 2)
+  generator_adapter:
+    owns:
+      - provider clients (OpenAI, Anthropic)
+      - scripted generators
+      - cassette record/replay
+    status: planned (Phase 4)
+  graders_and_taxonomy:
+    owns:
+      - value normalization
+      - correctness by item kind
+      - value provenance / hallucination
+      - citations & conflict grading
+      - failure taxonomy
+    status: partial (normalizer implemented in Phase 1, rest Phase 5)
+  suites_and_runner:
+    owns:
+      - smoke & core suites
+      - runner execution pool
+      - trace generation
+    status: planned (Phase 6)
+  reports_and_stats:
+    owns:
+      - Wilson intervals
+      - paired bootstrap & McNemar test
+      - lost-in-the-middle score
+      - report markdown & CLI compare
+    status: planned (Phase 7)

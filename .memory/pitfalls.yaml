@@ -1,0 +1,12 @@
+pitfalls:
+  typer_single_command_collapse:
+    pitfall: In Typer, defining only a single @app.command without an explicit @app.callback() collapses the CLI into a single-command app, failing subcommand invocations like `ragstress gen-kb`.
+    fix: Always declare an explicit `@app.callback()` on the root `Typer` instance.
+
+  syllable_clustering:
+    pitfall: Checking pronounceability across multi-syllable generated words can produce false negatives if syllable boundary consonants form unplanned 3-consonant clusters.
+    fix: Restrict syllable codas and onsets so compound clusters cannot exceed 2 consonants unless matching the whitelist.
+
+  normalization_approximate_rejection:
+    pitfall: Words like "about", "approx", or "~" in front of numbers must normalize to None (rejected) rather than stripping the word and accepting the number, per SPEC §8.1.
+    fix: Check disallowed prefix qualifiers before regex value extraction.

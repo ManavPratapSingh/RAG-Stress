@@ -1,0 +1,24 @@
+Fact:
+  meaning: Structured record (fact_id, entity_id, entity_name, attribute, value, value_type, unit, effective_date, status)
+Passage:
+  meaning: Rendered text document stating 1–3 facts about one entity, plus metadata (doc_id, title, text, status, effective_date, facts, role)
+GoldPassage:
+  meaning: The passage in context that states the exact fact the question asks about
+Twin:
+  meaning: A generated passage stating a different value for the same (entity, attribute) as the gold passage (dated, authority, or unresolvable conflict)
+Distractor:
+  meaning: A passage that does not state the asked (entity, attribute) but resembles it (same attr other entity, same entity other attr, near miss entity, or random)
+Item:
+  meaning: (question, StressCondition, seed) representing one graded test case
+Context:
+  meaning: Ordered list of passages shown to the generator under test
+ModeA:
+  meaning: Generator-only evaluation mode where the stress engine builds the context directly
+ModeB:
+  meaning: End-to-end evaluation mode where a retriever fetches the context from an index with injected noise
+OracleItem:
+  meaning: Evaluation control with gold passage only and no noise
+ClosedBookItem:
+  meaning: Evaluation control with k_noise = 0 and empty context to test leakage
+CanonicalValue:
+  meaning: The standardized string representation of a value parsed by the normalizer

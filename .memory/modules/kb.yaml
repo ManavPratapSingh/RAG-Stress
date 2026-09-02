@@ -1,0 +1,29 @@
+module: kb
+owns:
+  - synthetic pseudo-word generation
+  - entity kinds (Policy, Product, Facility)
+  - structured fact modeling and generation
+  - passage rendering with paraphrase templates and neutral filler padding
+  - question generation
+  - base KB generation (300 passages, 600 facts, 600 questions)
+
+depends_on:
+  - pydantic
+  - graders.normalize (for acceptance verification)
+
+entry_points:
+  - ragstress gen-kb --seed S --out <dir>
+  - gen-kb --seed S --out <dir>
+  - ragstress.kb.generator:generate_base_kb
+
+important_classes:
+  - ragstress.kb.facts:Fact
+  - ragstress.kb.facts:Passage
+  - ragstress.kb.questions:Question
+
+known_constraints:
+  - base KB has exactly 300 passages, each with 1-3 facts about one entity
+  - each (entity, attribute) appears in exactly one base passage, status=official
+  - passage word count must be between 60 and 180 words
+  - rendered values must normalize back to canonical fact value
+  - same renderer used for gold, twins, and distractors to eliminate style leaks

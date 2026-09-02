@@ -1,0 +1,21 @@
+active_phase: "Phase 1: Synthetic knowledge base & questions"
+status: "completed"
+next_phase: "Phase 2: Retrieval stack & retrieval metrics"
+
+completed_artifacts:
+  - pyproject.toml (with ruff, pytest, mypy, build configuration)
+  - Makefile (setup, test, lint, format, typecheck, gen-kb)
+  - AGENTS.md
+  - src/ragstress/graders/normalize.py
+  - src/ragstress/kb/names.py
+  - src/ragstress/kb/facts.py
+  - src/ragstress/kb/render.py
+  - src/ragstress/kb/questions.py
+  - src/ragstress/kb/generator.py
+  - src/ragstress/cli.py
+  - tests/unit/ (52 tests passing: determinism, names, facts, render, questions, normalize)
+
+key_assumptions:
+  - 150 entities (50 Policy, 50 Product, 50 Facility), each with 4 attributes, partitioned into 2 passages (2 facts each) yields exactly 300 base passages and 600 facts/questions.
+  - Neutral corporate filler pool provides sufficient padding to strictly adhere to 60-180 word passage length.
+  - Deterministic serialization uses sorted keys in JSON and stable document numbering.
