@@ -10,3 +10,4 @@ pitfalls:
   normalization_approximate_rejection:
     pitfall: Words like "about", "approx", or "~" in front of numbers must normalize to None (rejected) rather than stripping the word and accepting the number, per SPEC §8.1.
     fix: Check disallowed prefix qualifiers before regex value extraction.
+

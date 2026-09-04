@@ -1,0 +1,25 @@
+module: retrieval
+owns:
+  - sentence-boundary chunking
+  - custom BM25 index with stable tie-breaks
+  - deterministic HashEmbedder (512-dim)
+  - FlatStore exact cosine vector store
+  - Reciprocal Rank Fusion (RRF) hybrid retrieval
+  - standard retrieval metrics (Hit@K, Recall@K, Precision@K, MRR, nDCG@K, distractor_rate@K)
+
+depends_on:
+  - numpy
+  - pydantic
+
+important_classes:
+  - ragstress.retrieval.chunker:Chunk
+  - ragstress.retrieval.bm25:BM25Index
+  - ragstress.retrieval.bm25:RetrievedChunk
+  - ragstress.retrieval.embedders:HashEmbedder
+  - ragstress.retrieval.stores:FlatStore
+  - ragstress.retrieval.metrics:RetrievalMetrics
+
+known_constraints:
+  - chunker splits only on sentence terminals, preserving integrity
+  - BM25 uses Robertson/Spärck Jones IDF: ln(1 + (N - n + 0.5) / (n + 0.5))
+  - all ties broken deterministically by ascending chunk_id / doc_id

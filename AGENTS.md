@@ -9,3 +9,4 @@ Instructions for AI Coding Agents working on RAG-Stress:
 5. **Maintain persistent project memory**: Keep `.memory/` updated after every phase with architectural insights, module schemas, patterns, and decisions.
 6. **Run `make test` and `make lint` before stopping**: All tests must pass offline without network access. Coverage on core modules must meet SPEC NFR-6 (≥85%).
 7. **Don't build outside the current phase**: Keep solutions minimal, robust, and cleanly scoped.
+

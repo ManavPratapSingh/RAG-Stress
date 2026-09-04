@@ -20,3 +20,4 @@
 - **Alternatives Considered:** Mock normalizer in tests.
 - **Trade-offs:** Slightly more code upfront in Phase 1, but guarantees that Phase 1 outputs strictly conform to SPEC §8.1 before downstream phases rely on them.
 - **Status:** Active.
+

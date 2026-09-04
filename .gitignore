@@ -16,6 +16,7 @@ runs/
 traces/
 cassettes/
 
+
 # Meta documentation and agent tooling
 docs/
 .agent/

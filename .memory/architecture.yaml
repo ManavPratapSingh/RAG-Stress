@@ -25,7 +25,7 @@ pipeline_stages:
       - HashEmbedder & SentenceTransformerEmbedder
       - FlatStore & QdrantStore
       - retrieval metrics (Hit@K, Recall@K, Precision@K, MRR, nDCG)
-    status: planned (Phase 2)
+    status: implemented (Phase 2)
   generator_adapter:
     owns:
       - provider clients (OpenAI, Anthropic)
@@ -53,3 +53,4 @@ pipeline_stages:
       - lost-in-the-middle score
       - report markdown & CLI compare
     status: planned (Phase 7)
+

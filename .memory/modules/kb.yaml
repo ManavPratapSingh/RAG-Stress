@@ -27,3 +27,4 @@ known_constraints:
   - passage word count must be between 60 and 180 words
   - rendered values must normalize back to canonical fact value
   - same renderer used for gold, twins, and distractors to eliminate style leaks
+
