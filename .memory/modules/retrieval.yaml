@@ -23,3 +23,4 @@ known_constraints:
   - chunker splits only on sentence terminals, preserving integrity
   - BM25 uses Robertson/Spärck Jones IDF: ln(1 + (N - n + 0.5) / (n + 0.5))
   - all ties broken deterministically by ascending chunk_id / doc_id
+

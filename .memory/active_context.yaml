@@ -1,16 +1,16 @@
-active_phase: "Phase 2: Retrieval stack & retrieval metrics"
+active_phase: "Phase 3: Stress engine"
 status: "completed"
-next_phase: "Phase 3: Stress engine"
+next_phase: "Phase 4: Generator under test"
 
 completed_artifacts:
   - Phase 1 KB & Normalizer (52 tests)
-  - src/ragstress/retrieval/chunker.py
-  - src/ragstress/retrieval/bm25.py
-  - src/ragstress/retrieval/embedders.py
-  - src/ragstress/retrieval/stores.py
-  - src/ragstress/retrieval/hybrid.py
-  - src/ragstress/retrieval/metrics.py
-  - tests/unit/test_retrieval.py (6 tests, total 58 passing)
+  - Phase 2 Retrieval Stack (6 tests)
+  - src/ragstress/stress/spec.py
+  - src/ragstress/stress/distractors.py
+  - src/ragstress/stress/conflict.py
+  - src/ragstress/stress/position.py
+  - src/ragstress/stress/builder.py
+  - tests/unit/test_stress.py (8 tests, total 66 passing)
 
 key_assumptions:
   - 150 entities (50 Policy, 50 Product, 50 Facility), each with 4 attributes, partitioned into 2 passages (2 facts each) yields exactly 300 base passages and 600 facts/questions.

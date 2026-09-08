@@ -17,7 +17,7 @@ pipeline_stages:
       - distractor synthesis
       - conflict twins (dated, authority, unresolvable)
       - position shuffling & opaque doc IDs
-    status: planned (Phase 3)
+    status: implemented (Phase 3)
   retrieval_stack:
     owns:
       - sentence chunking

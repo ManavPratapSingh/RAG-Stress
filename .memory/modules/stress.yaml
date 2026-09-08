@@ -1,0 +1,22 @@
+module: stress
+owns:
+  - StressCondition configuration model (k_noise, position, conflict, answerable, distractor_mix)
+  - Distractor generation with value-collision filtering (same_attr_other_entity, same_entity_other_attr, near_miss_entity, random_irrelevant)
+  - Conflict twins generation (dated, authority, unresolvable)
+  - Position placement (top, middle, bottom, random)
+  - Opaque document ID derivation (doc- + 6 base32 chars)
+  - Context building (pure function: (question, base_passages, all_facts, condition, seed, item_id) -> Context)
+
+depends_on:
+  - kb (facts, render, questions)
+  - pydantic
+
+important_classes:
+  - ragstress.stress.spec:StressCondition
+  - ragstress.stress.builder:Context
+  - ragstress.stress.builder:build_context
+
+known_constraints:
+  - value-collision filter: distractor fact cannot share gold fact value for same value_type
+  - opaque doc IDs carry no information regarding position or role
+  - unanswerable items exclude gold and twin; k_noise=0 yields empty context
