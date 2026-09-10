@@ -28,10 +28,10 @@ pipeline_stages:
     status: implemented (Phase 2)
   generator_adapter:
     owns:
-      - provider clients (OpenAI, Anthropic)
+      - provider clients (OpenAI)
       - scripted generators
       - cassette record/replay
-    status: planned (Phase 4)
+    status: implemented (Phase 4)
   graders_and_taxonomy:
     owns:
       - value normalization

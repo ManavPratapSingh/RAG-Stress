@@ -1,19 +1,20 @@
-active_phase: "Phase 3: Stress engine"
+active_phase: "Phase 4: Generator under test"
 status: "completed"
-next_phase: "Phase 4: Generator under test"
+next_phase: "Phase 5: Graders & failure taxonomy"
 
 completed_artifacts:
   - Phase 1 KB & Normalizer (52 tests)
   - Phase 2 Retrieval Stack (6 tests)
-  - src/ragstress/stress/spec.py
-  - src/ragstress/stress/distractors.py
-  - src/ragstress/stress/conflict.py
-  - src/ragstress/stress/position.py
-  - src/ragstress/stress/builder.py
-  - tests/unit/test_stress.py (8 tests, total 66 passing)
+  - Phase 3 Stress Engine (8 tests)
+  - src/ragstress/gen/schema.py
+  - src/ragstress/gen/prompts.py
+  - src/ragstress/gen/scripted.py
+  - src/ragstress/gen/recording.py
+  - src/ragstress/gen/replay.py
+  - src/ragstress/gen/openai_gen.py
+  - tests/unit/test_gen.py (4 tests, total 70 passing)
 
 key_assumptions:
-  - 150 entities (50 Policy, 50 Product, 50 Facility), each with 4 attributes, partitioned into 2 passages (2 facts each) yields exactly 300 base passages and 600 facts/questions.
-  - Neutral corporate filler pool provides sufficient padding to strictly adhere to 60-180 word passage length.
-  - Deterministic serialization uses sorted keys in JSON and stable document numbering.
-
+  - Strict OpenAI tool-calling schema with additionalProperties=False enforces valid JSON structure from the LLM.
+  - Hashing (model_slug, prompt_version, system, user, schema, params) uniquely isolates cassettes.
+  - ScriptedGenerator provides oracle, abstention, distractor-picking, and hallucination baselines without calling any network LLM.

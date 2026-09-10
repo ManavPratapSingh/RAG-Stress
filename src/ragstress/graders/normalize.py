@@ -37,9 +37,12 @@ DISALLOWED_PREFIXES_REGEX = re.compile(
 K_NOTATION_REGEX = re.compile(r"^\$?\s*[\d.]+\s*k\b", re.IGNORECASE)
 
 
+ValueType = Literal["int", "money", "date", "duration", "enum"]
+
+
 def normalize_value(
     raw_value: str | None,
-    value_type: Literal["int", "money", "date", "duration", "enum"],
+    value_type: ValueType | str,
     allowed_enums: list[str] | set[str] | None = None,
 ) -> str | None:
     """Normalize a raw string value into its canonical form.

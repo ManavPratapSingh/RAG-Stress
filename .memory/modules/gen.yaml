@@ -1,0 +1,36 @@
+name: gen
+path: src/ragstress/gen
+description: Generator adapters, prompt rendering, structured tool schemas, scripted policies, and cassette record/replay.
+dependencies:
+  - pydantic
+  - hashlib
+  - json
+  - time
+
+components:
+  - name: GenOutput
+    file: src/ragstress/gen/schema.py
+    description: Pydantic model for structured generation responses (answer, citations, abstained, conflict_detected, confidence, reason).
+  - name: SUBMIT_ANSWER_SCHEMA
+    file: src/ragstress/gen/schema.py
+    description: Strict OpenAI tool calling schema enforcing required properties and disallowed additionalProperties.
+  - name: SYSTEM_PROMPT
+    file: src/ragstress/gen/prompts.py
+    description: System prompt enforcing rules R1-R6, frozen prompt version '1', and passage rendering.
+  - name: ScriptedGenerator
+    file: src/ragstress/gen/scripted.py
+    description: Deterministic offline behavioral generator supporting oracle, abstain_always, first_passage, hallucinate, ignore_conflict, pick_distractor, fabricate_citation.
+  - name: RecordingGenerator
+    file: src/ragstress/gen/recording.py
+    description: Transparent caching wrapper that records live generator executions to hashed cassette files.
+  - name: ReplayGenerator
+    file: src/ragstress/gen/replay.py
+    description: Zero-network generator serving pre-recorded outputs from cassette files; raises CassetteMiss on cache miss.
+  - name: OpenAIGenerator
+    file: src/ragstress/gen/openai_gen.py
+    description: Live API generator forcing submit_answer tool calling with retry/fallback logic.
+
+known_constraints:
+  - Prompt version string must be hashed into cassette keys to invalidate cache on prompt modifications.
+  - ReplayGenerator must strictly reject network calls and only read from disk.
+  - Scripted policies provide deterministic baselines for smoke tests and grader calibration.
