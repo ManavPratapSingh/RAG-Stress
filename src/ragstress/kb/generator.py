@@ -3,6 +3,7 @@
 import random
 
 from ragstress.kb.facts import (
+    BaseKB,
     Fact,
     Passage,
     generate_facts_for_entity,
@@ -99,3 +100,9 @@ def generate_base_kb(
         all_questions.append(q)
 
     return all_passages, all_facts, all_questions
+
+
+def generate_base_kb_container(seed: int = 42) -> BaseKB:
+    """Generate and return BaseKB container object."""
+    passages, facts, questions = generate_base_kb(seed=seed)
+    return BaseKB(passages=passages, facts=facts, questions=questions)

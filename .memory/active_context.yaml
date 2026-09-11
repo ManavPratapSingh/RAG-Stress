@@ -1,20 +1,22 @@
-active_phase: "Phase 4: Generator under test"
+active_phase: "Phase 5: Graders & failure taxonomy"
 status: "completed"
-next_phase: "Phase 5: Graders & failure taxonomy"
+next_phase: "Phase 6: Suites, controls, runner"
 
 completed_artifacts:
   - Phase 1 KB & Normalizer (52 tests)
   - Phase 2 Retrieval Stack (6 tests)
   - Phase 3 Stress Engine (8 tests)
-  - src/ragstress/gen/schema.py
-  - src/ragstress/gen/prompts.py
-  - src/ragstress/gen/scripted.py
-  - src/ragstress/gen/recording.py
-  - src/ragstress/gen/replay.py
-  - src/ragstress/gen/openai_gen.py
-  - tests/unit/test_gen.py (4 tests, total 70 passing)
+  - Phase 4 Generator Under Test (4 tests)
+  - src/ragstress/graders/provenance.py
+  - src/ragstress/graders/citations.py
+  - src/ragstress/graders/conflict.py
+  - src/ragstress/graders/correctness.py
+  - src/ragstress/graders/taxonomy.py
+  - src/ragstress/graders/item_grader.py
+  - src/ragstress/graders/metrics.py
+  - tests/unit/test_graders.py (7 tests, total 77 passing)
 
 key_assumptions:
-  - Strict OpenAI tool-calling schema with additionalProperties=False enforces valid JSON structure from the LLM.
-  - Hashing (model_slug, prompt_version, system, user, schema, params) uniquely isolates cassettes.
-  - ScriptedGenerator provides oracle, abstention, distractor-picking, and hallucination baselines without calling any network LLM.
+  - Hallucination is defined as value provenance == "none" (not found in any structured fact within the provided context).
+  - Unresolvable conflict items require setting conflict=True and listing complete conflicting values, without asserting an answer.
+  - Failure taxonomy uses strict first-match-wins ordering (format_error > retrieval_miss > stale_adopted > distractor_adopted > hallucinated > false_abstain > conflict_ignored > conflict_incomplete > other_wrong).

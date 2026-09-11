@@ -39,7 +39,7 @@ pipeline_stages:
       - value provenance / hallucination
       - citations & conflict grading
       - failure taxonomy
-    status: partial (normalizer implemented in Phase 1, rest Phase 5)
+    status: implemented (Phase 5)
   suites_and_runner:
     owns:
       - smoke & core suites

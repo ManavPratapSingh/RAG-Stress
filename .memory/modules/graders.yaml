@@ -1,0 +1,38 @@
+name: graders
+path: src/ragstress/graders
+description: Deterministic evaluation graders, value normalization, value provenance, correctness by kind, citation evaluation, conflict grading, aggregate metrics, and hierarchical failure taxonomy.
+dependencies:
+  - pydantic
+  - re
+  - datetime
+
+components:
+  - name: normalize_value
+    file: src/ragstress/graders/normalize.py
+    description: Canonical normalization for int, money, date, duration, and enum types.
+  - name: determine_provenance
+    file: src/ragstress/graders/provenance.py
+    description: Classifies asserted answer values into gold, conflict_loser, distractor, or none (hallucinated).
+  - name: grade_correctness
+    file: src/ragstress/graders/correctness.py
+    description: Evaluates pass_answer and pass_strict across answerable_plain, dated, authority, unresolvable, and unanswerable item kinds.
+  - name: grade_citations
+    file: src/ragstress/graders/citations.py
+    description: Evaluates citation precision, recall, exact match, and fabricated IDs against context doc IDs.
+  - name: grade_conflict
+    file: src/ragstress/graders/conflict.py
+    description: Evaluates conflict detection, completeness of reported values, false conflict flags, and resolution of dated/authority conflicts.
+  - name: classify_failure
+    file: src/ragstress/graders/taxonomy.py
+    description: First-match-wins failure attribution taxonomy (format_error > retrieval_miss > stale_adopted > distractor_adopted > hallucinated > false_abstain > conflict_ignored > conflict_incomplete > other_wrong).
+  - name: grade_item
+    file: src/ragstress/graders/item_grader.py
+    description: Composite evaluator returning a comprehensive GradedItem.
+  - name: compute_aggregate_metrics
+    file: src/ragstress/graders/metrics.py
+    description: Slices and summarizes GradedItem instances into benchmark-wide rates and metrics.
+
+known_constraints:
+  - Hallucination is strictly defined as provenance == "none" (value in no provided passage).
+  - Provenance relies on structured facts of context passages, not loose string substring searching.
+  - Failure taxonomy ordering is strictly hierarchical (first match wins).

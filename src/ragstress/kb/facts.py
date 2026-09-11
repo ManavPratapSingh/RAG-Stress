@@ -3,7 +3,7 @@
 import random
 from dataclasses import dataclass
 from datetime import date, timedelta
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -28,6 +28,14 @@ class Passage(BaseModel):
     effective_date: date
     facts: list[Fact] = Field(default_factory=list)  # ground truth of what the text states (1–3)
     role: str | None = None  # set only inside a built context, see §6.6
+
+
+class BaseKB(BaseModel):
+    """Container for complete synthetic knowledge base."""
+
+    passages: list[Passage]
+    facts: list[Fact]
+    questions: list[Any] = Field(default_factory=list)
 
 
 @dataclass(frozen=True)

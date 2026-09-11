@@ -3,6 +3,7 @@
 import hashlib
 import json
 from pathlib import Path
+from typing import Any
 
 import typer
 
@@ -74,6 +75,196 @@ def gen_kb_command(
     typer.echo(
         f"Generated base KB: {len(passages)} passages, {len(facts)} facts, "
         f"{len(questions)} questions into {out} (seed={seed})"
+    )
+
+
+@app.command("generate-suite")
+def generate_suite_command(
+    name: str = typer.Option("smoke", "--name", "-n", help="Suite name (smoke or core)"),
+    seed: int = typer.Option(42, "--seed", "-s", help="Random seed for generation"),
+    kb_dir: Path = typer.Option(Path("data/kb"), "--kb-dir", help="Path to base KB directory"),
+    out: Path = typer.Option(Path("data/suites"), "--out", "-o", help="Output directory"),
+) -> None:
+    """Generate evaluation suite items (SPEC §9.2)."""
+    from ragstress.kb.facts import BaseKB, Fact, Passage
+    from ragstress.kb.questions import Question
+    from ragstress.suites.generator import generate_suite
+
+    out.mkdir(parents=True, exist_ok=True)
+
+    # Load or generate KB
+    if (kb_dir / "passages.jsonl").exists():
+        passages = [
+            Passage.model_validate_json(line)
+            for line in (kb_dir / "passages.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        facts = [
+            Fact.model_validate_json(line)
+            for line in (kb_dir / "facts.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        questions = [
+            Question.model_validate_json(line)
+            for line in (kb_dir / "questions.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        kb = BaseKB(passages=passages, facts=facts, questions=questions)
+    else:
+        passages, facts, questions = generate_base_kb(seed=seed)
+        kb = BaseKB(passages=passages, facts=facts, questions=questions)
+
+    items = generate_suite(name=name, kb=kb, seed=seed)
+    suite_file = out / f"{name}.jsonl"
+    lines = [json.dumps(it.model_dump(mode="json"), sort_keys=True) for it in items]
+    suite_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    typer.echo(f"Generated suite '{name}' with {len(items)} items to {suite_file}")
+
+
+@app.command("validate-suite")
+def validate_suite_command(
+    suite_path: Path = typer.Argument(..., help="Path to suite .jsonl file"),
+    kb_dir: Path = typer.Option(Path("data/kb"), "--kb-dir", help="Path to base KB directory"),
+    seed: int = typer.Option(42, "--seed", "-s", help="Seed if generating base KB"),
+) -> None:
+    """Validate suite invariants (SPEC §9.4)."""
+    from ragstress.kb.facts import BaseKB, Fact, Passage
+    from ragstress.kb.questions import Question
+    from ragstress.suites.schema import SuiteItem
+    from ragstress.suites.validator import validate_suite
+
+    if not suite_path.exists():
+        typer.secho(f"Error: suite file {suite_path} does not exist", fg=typer.colors.RED)
+        raise typer.Exit(code=1)
+
+    items = [
+        SuiteItem.model_validate_json(line)
+        for line in suite_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+
+    # Load or generate KB
+    if (kb_dir / "passages.jsonl").exists():
+        passages = [
+            Passage.model_validate_json(line)
+            for line in (kb_dir / "passages.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        facts = [
+            Fact.model_validate_json(line)
+            for line in (kb_dir / "facts.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        questions = [
+            Question.model_validate_json(line)
+            for line in (kb_dir / "questions.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        kb = BaseKB(passages=passages, facts=facts, questions=questions)
+    else:
+        passages, facts, questions = generate_base_kb(seed=seed)
+        kb = BaseKB(passages=passages, facts=facts, questions=questions)
+
+    res = validate_suite(items, kb)
+    if res.valid:
+        typer.secho(
+            f"Suite validation PASSED for {res.total_items} items (oracle strict accuracy: {res.oracle_strict_accuracy:.1%})",
+            fg=typer.colors.GREEN,
+        )
+    else:
+        typer.secho(f"Suite validation FAILED with {len(res.errors)} errors:", fg=typer.colors.RED)
+        for err in res.errors[:10]:
+            typer.echo(f"  - {err}")
+        if len(res.errors) > 10:
+            typer.echo(f"  ... and {len(res.errors) - 10} more errors")
+        raise typer.Exit(code=1)
+
+
+@app.command("run")
+def run_command_cli(
+    suite: Path = typer.Option(
+        Path("data/suites/smoke.jsonl"), "--suite", help="Path to suite file"
+    ),
+    generator: str = typer.Option(
+        "scripted:oracle", "--generator", "-g", help="Generator identifier"
+    ),
+    output_dir: Path = typer.Option(Path("runs/latest"), "--out", "-o", help="Output directory"),
+    concurrency: int = typer.Option(4, "--concurrency", "-c", help="Worker concurrency"),
+    trials: int = typer.Option(1, "--trials", "-t", help="Number of trials per item"),
+    seed: int = typer.Option(42, "--seed", "-s", help="Seed if generating base KB"),
+    kb_dir: Path = typer.Option(Path("data/kb"), "--kb-dir", help="Path to base KB directory"),
+) -> None:
+    """Execute benchmark runner on a suite (SPEC §10)."""
+    from ragstress.gen.recording import RecordingGenerator
+    from ragstress.gen.replay import ReplayGenerator
+    from ragstress.gen.scripted import ScriptedGenerator
+    from ragstress.kb.facts import BaseKB, Fact, Passage
+    from ragstress.kb.questions import Question
+    from ragstress.runner.executor import run_suite
+    from ragstress.suites.generator import generate_suite
+    from ragstress.suites.schema import SuiteItem
+
+    # Load or generate KB
+    if (kb_dir / "passages.jsonl").exists():
+        passages = [
+            Passage.model_validate_json(line)
+            for line in (kb_dir / "passages.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        facts = [
+            Fact.model_validate_json(line)
+            for line in (kb_dir / "facts.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        questions = [
+            Question.model_validate_json(line)
+            for line in (kb_dir / "questions.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        kb = BaseKB(passages=passages, facts=facts, questions=questions)
+    else:
+        passages, facts, questions = generate_base_kb(seed=seed)
+        kb = BaseKB(passages=passages, facts=facts, questions=questions)
+
+    # Load items
+    if suite.exists():
+        items = [
+            SuiteItem.model_validate_json(line)
+            for line in suite.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+    else:
+        # Fallback to generating smoke suite
+        items = generate_suite(name="smoke", kb=kb, seed=seed)
+
+    # Instantiate generator
+    gen_instance: Any
+    if generator.startswith("scripted:"):
+        policy = generator.split(":", 1)[1]
+        gen_instance = ScriptedGenerator(policy=policy)
+    elif generator.startswith("replay:"):
+        slug = generator.split(":", 1)[1]
+        gen_instance = ReplayGenerator(model_slug=slug)
+    elif generator.startswith("openai:"):
+        from ragstress.gen.openai_gen import OpenAIGenerator
+
+        model_name = generator.split(":", 1)[1]
+        live_gen = OpenAIGenerator(model=model_name)
+        gen_instance = RecordingGenerator(inner_generator=live_gen, model_slug=model_name)
+    else:
+        gen_instance = ScriptedGenerator(policy="oracle")
+
+    run_path = run_suite(
+        items=items,
+        kb=kb,
+        generator=gen_instance,
+        output_dir=output_dir,
+        concurrency=concurrency,
+        trials=trials,
+    )
+    typer.secho(
+        f"Benchmark run complete. Results and traces written to: {run_path}", fg=typer.colors.GREEN
     )
 
 
