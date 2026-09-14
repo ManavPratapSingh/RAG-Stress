@@ -36,3 +36,4 @@ known_constraints:
   - Hallucination is strictly defined as provenance == "none" (value in no provided passage).
   - Provenance relies on structured facts of context passages, not loose string substring searching.
   - Failure taxonomy ordering is strictly hierarchical (first match wins).
+

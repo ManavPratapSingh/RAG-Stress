@@ -1,0 +1,14 @@
+version: "1.0.0"
+chunking:
+  chunk_size_words: 120
+retriever:
+  bm25_k1: 1.5
+  bm25_b: 0.75
+  rrf_k: 60
+suites:
+  smoke_size: 58
+  core_size: 1120
+bootstrap:
+  num_resamples: 10000
+  confidence: 0.95
+  seed: 42

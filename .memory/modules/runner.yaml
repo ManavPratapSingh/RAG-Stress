@@ -1,0 +1,28 @@
+name: runner
+path: src/ragstress/runner
+description: Multi-threaded benchmark execution engine, Mode A/B orchestration, per-item JSON traces, tabular results.jsonl, and run manifest.
+dependencies:
+  - concurrent.futures
+  - pydantic
+  - json
+  - datetime
+  - subprocess
+
+components:
+  - name: RunManifest
+    file: src/ragstress/runner/schema.py
+    description: Run metadata record capturing git sha, KB hash, suite hash, environment versions, and execution times.
+  - name: ItemTrace
+    file: src/ragstress/runner/schema.py
+    description: Full per-trial execution trace capturing context, retrieved docs, raw output, parsed schema, grades, and usage.
+  - name: ResultRow
+    file: src/ragstress/runner/schema.py
+    description: Flattened row matching SPEC §10.5 format for statistical reporting.
+  - name: run_suite
+    file: src/ragstress/runner/executor.py
+    description: Concurrently executes suite items across trials, sorting outputs deterministically by (item_id, trial).
+
+known_constraints:
+  - Results and traces must be sorted by (item_id, trial) to guarantee byte-identical outputs across runs.
+  - No wall-clock timestamps in traces or results.jsonl (timestamps live exclusively in manifest.json).
+  - Mode B uses BM25Index to query top-k and measures retrieval metrics per item.

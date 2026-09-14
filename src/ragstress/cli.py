@@ -268,6 +268,66 @@ def run_command_cli(
     )
 
 
+@app.command("report")
+def report_command(
+    run_dir: Path = typer.Argument(
+        ..., help="Path to run directory containing results.jsonl and manifest.json"
+    ),
+    out: Path | None = typer.Option(
+        None,
+        "--out",
+        "-o",
+        help="Optional path to output markdown file (default: <run_dir>/report.md)",
+    ),
+) -> None:
+    """Generate markdown evaluation report from a benchmark run (SPEC §11.2)."""
+    from ragstress.report.generator import generate_report
+
+    if not run_dir.exists():
+        typer.secho(f"Error: run directory {run_dir} does not exist", fg=typer.colors.RED)
+        raise typer.Exit(code=1)
+
+    try:
+        report_md = generate_report(run_dir)
+        target = out or (run_dir / "report.md")
+        target.write_text(report_md, encoding="utf-8")
+        typer.secho(f"Report generated successfully: {target}", fg=typer.colors.GREEN)
+    except Exception as e:
+        typer.secho(f"Error generating report: {e}", fg=typer.colors.RED)
+        raise typer.Exit(code=1) from e
+
+
+@app.command("compare")
+def compare_command(
+    run_a: Path = typer.Argument(..., help="Path to first run directory (Run A)"),
+    run_b: Path = typer.Argument(..., help="Path to second run directory (Run B)"),
+    out: Path | None = typer.Option(
+        None, "--out", "-o", help="Optional path to output comparison markdown file"
+    ),
+) -> None:
+    """Compare two benchmark runs using paired statistics (SPEC §11.3)."""
+    from ragstress.report.compare import compare_runs
+
+    for p in [run_a, run_b]:
+        if not p.exists():
+            typer.secho(f"Error: run directory {p} does not exist", fg=typer.colors.RED)
+            raise typer.Exit(code=1)
+
+    try:
+        comp_md = compare_runs(run_a, run_b)
+        if out:
+            out.write_text(comp_md, encoding="utf-8")
+            typer.secho(f"Comparison written to: {out}", fg=typer.colors.GREEN)
+        else:
+            typer.echo(comp_md)
+    except ValueError as e:
+        typer.secho(f"Comparison refused: {e}", fg=typer.colors.RED)
+        raise typer.Exit(code=1) from e
+    except Exception as e:
+        typer.secho(f"Error comparing runs: {e}", fg=typer.colors.RED)
+        raise typer.Exit(code=1) from e
+
+
 def gen_kb_standalone() -> None:
     """Entrypoint for standalone gen-kb CLI command."""
     gen_app = typer.Typer(add_completion=False)

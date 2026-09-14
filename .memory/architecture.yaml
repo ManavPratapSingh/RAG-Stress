@@ -45,7 +45,7 @@ pipeline_stages:
       - smoke & core suites
       - runner execution pool
       - trace generation
-    status: planned (Phase 6)
+    status: implemented (Phase 6)
   reports_and_stats:
     owns:
       - Wilson intervals

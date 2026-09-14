@@ -1,0 +1,17 @@
+version: "2024-10-01"
+models:
+  gpt-4o-mini:
+    input_per_mtok: 0.15
+    output_per_mtok: 0.60
+  gpt-4o:
+    input_per_mtok: 2.50
+    output_per_mtok: 10.00
+  claude-3-5-sonnet:
+    input_per_mtok: 3.00
+    output_per_mtok: 15.00
+  claude-3-haiku:
+    input_per_mtok: 0.25
+    output_per_mtok: 1.25
+  scripted:
+    input_per_mtok: 0.0
+    output_per_mtok: 0.0

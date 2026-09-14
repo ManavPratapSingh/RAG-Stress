@@ -1,22 +1,23 @@
-active_phase: "Phase 5: Graders & failure taxonomy"
+active_phase: "Phase 6: Suites, controls, runner"
 status: "completed"
-next_phase: "Phase 6: Suites, controls, runner"
+next_phase: "Phase 7: Analysis & report"
 
 completed_artifacts:
   - Phase 1 KB & Normalizer (52 tests)
   - Phase 2 Retrieval Stack (6 tests)
   - Phase 3 Stress Engine (8 tests)
   - Phase 4 Generator Under Test (4 tests)
-  - src/ragstress/graders/provenance.py
-  - src/ragstress/graders/citations.py
-  - src/ragstress/graders/conflict.py
-  - src/ragstress/graders/correctness.py
-  - src/ragstress/graders/taxonomy.py
-  - src/ragstress/graders/item_grader.py
-  - src/ragstress/graders/metrics.py
-  - tests/unit/test_graders.py (7 tests, total 77 passing)
+  - Phase 5 Graders & Taxonomy (7 tests)
+  - src/ragstress/suites/schema.py
+  - src/ragstress/suites/generator.py
+  - src/ragstress/suites/validator.py
+  - src/ragstress/runner/schema.py
+  - src/ragstress/runner/executor.py
+  - src/ragstress/cli.py (generate-suite, validate-suite, run commands)
+  - tests/unit/test_suites.py (2 tests)
+  - tests/unit/test_runner.py (2 tests, total 81 passing)
 
 key_assumptions:
-  - Hallucination is defined as value provenance == "none" (not found in any structured fact within the provided context).
-  - Unresolvable conflict items require setting conflict=True and listing complete conflicting values, without asserting an answer.
-  - Failure taxonomy uses strict first-match-wins ordering (format_error > retrieval_miss > stale_adopted > distractor_adopted > hallucinated > false_abstain > conflict_ignored > conflict_incomplete > other_wrong).
+  - Suites maintain balanced stratified sampling with fixed 25% dev / 75% test split based on hashed question ID.
+  - Concurrency uses thread pool workers with output lists sorted by (item_id, trial) for byte-identical determinism.
+  - Traces omit timestamps to prevent non-deterministic diffs; manifest captures wall-clock duration.

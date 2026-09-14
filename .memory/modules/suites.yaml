@@ -1,0 +1,23 @@
+name: suites
+path: src/ragstress/suites
+description: Evaluation benchmark suite generation, stratified question sampling, dev/test split assignment, and invariant validation.
+dependencies:
+  - pydantic
+  - hashlib
+  - random
+
+components:
+  - name: SuiteItem
+    file: src/ragstress/suites/schema.py
+    description: Schema for an evaluation benchmark item (item_id, split, group, question_id, seed, condition).
+  - name: generate_suite
+    file: src/ragstress/suites/generator.py
+    description: Generates standard benchmark suites (smoke or core) with stratified sampling and 25% dev / 75% test splits.
+  - name: validate_suite
+    file: src/ragstress/suites/validator.py
+    description: Validates suite invariants per SPEC §9.4 (unique item_id, known question_id, oracle strict 100%, empty closed-book context).
+
+known_constraints:
+  - Question split assignment is deterministic via SHA-256 hash of question_id.
+  - Smoke suite has ~60 items, core suite has ~1,120 items.
+  - Oracle generator must score 100% pass_strict across all solvable and unanswerable items.

@@ -1,0 +1,14 @@
+{
+  "run_id": "golden_fixture_run",
+  "generator": "openai:gpt-4o-mini",
+  "prompt_version": "1.0",
+  "git_sha": "golden0001",
+  "kb_hash": "golden_kb_hash_12345",
+  "suite_name": "smoke",
+  "suite_hash": "golden_suite_hash_67890",
+  "total_items": 4,
+  "concurrency": 1,
+  "trials": 1,
+  "started_at": "2026-10-15T00:00:00Z",
+  "finished_at": "2026-10-15T00:00:02Z"
+}
