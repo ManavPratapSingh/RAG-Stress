@@ -1,0 +1,17 @@
+name: report
+path: src/ragstress/report/
+purpose: "Generates 11-section markdown benchmark reports and executes paired run comparisons."
+key_files:
+  - path: src/ragstress/report/generator.py
+    symbols: [generate_report]
+    role: "Aggregates RunManifest and ResultRows into full Markdown benchmark report with LEAKAGE_WARNING check."
+  - path: src/ragstress/report/compare.py
+    symbols: [compare_runs]
+    role: "Compares two runs on identical item sets using paired bootstrap deltas, McNemar tests, and flipped item logs."
+  - path: src/ragstress/report/pricing.py
+    symbols: [PricingEngine]
+    role: "Resolves model tokens against config/models.yaml to compute run cost and cost per correct item."
+invariants:
+  - "Parametric leakage is strictly defined as unanswerable items where answer == gold value and the model did not abstain."
+  - "compare_runs raises ValueError and exits non-zero if item sets between Run A and Run B do not match exactly."
+  - "Unknown model generators fall back to None for cost computation with prominent markdown notice."

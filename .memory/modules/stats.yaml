@@ -1,0 +1,20 @@
+name: stats
+path: src/ragstress/stats/
+purpose: "Statistical inference methods for RAG-Stress benchmark analysis (Wilson intervals, exact McNemar test, paired bootstrap difference of means, lost-in-the-middle score)."
+key_files:
+  - path: src/ragstress/stats/wilson.py
+    symbols: [wilson_score_interval]
+    role: "Computes 95% Wilson score interval for binomial proportions, maintaining reliable coverage near 0% and 100%."
+  - path: src/ragstress/stats/mcnemar.py
+    symbols: [mcnemar_exact_test]
+    role: "Performs exact two-sided McNemar test on paired binary observations using discordant pair counts."
+  - path: src/ragstress/stats/bootstrap.py
+    symbols: [paired_bootstrap_mean_difference]
+    role: "10,000 seeded resamples with replacement computing empirical percentile confidence intervals."
+  - path: src/ragstress/stats/position.py
+    symbols: [compute_lost_in_the_middle, extract_question_id]
+    role: "Computes lost-in-the-middle position bias score and question-clustered bootstrap intervals."
+invariants:
+  - "Wilson intervals are clamped to [0.0, 1.0] and return (0.0, 0.0) when n=0."
+  - "Bootstrap resampling must use an explicit integer seed for replay determinism."
+  - "McNemar test requires equal-length paired input arrays; discordance sum 0 yields p=1.0."

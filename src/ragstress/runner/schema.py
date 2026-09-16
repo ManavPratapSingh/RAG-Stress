@@ -18,6 +18,7 @@ class RunManifest(BaseModel):
     total_items: int
     concurrency: int
     trials: int
+    intervention: str = "baseline"
     started_at: str
     finished_at: str
 

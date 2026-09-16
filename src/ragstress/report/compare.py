@@ -72,6 +72,14 @@ def compare_runs(run_a_dir: Path, run_b_dir: Path) -> str:
         [r.hallucinated for r in aligned_b], [r.hallucinated for r in aligned_a]
     )
 
+    # 4. False Abstain Rate (SPEC §12.3)
+    a_false_abs = [float(r.abstain and r.kind != "unanswerable") for r in aligned_a]
+    b_false_abs = [float(r.abstain and r.kind != "unanswerable") for r in aligned_b]
+    diff_fa, ci_low_fa, ci_high_fa = paired_bootstrap_mean_difference(b_false_abs, a_false_abs)
+    b_fa, c_fa, p_fa = mcnemar_exact_test(
+        [bool(x) for x in b_false_abs], [bool(x) for x in a_false_abs]
+    )
+
     lines = [
         f"# Run Comparison: `{manifest_a.run_id}` vs `{manifest_b.run_id}`",
         "",
@@ -86,6 +94,7 @@ def compare_runs(run_a_dir: Path, run_b_dir: Path) -> str:
         f"| Accuracy (`pass_answer`) | {diff_ans * 100:+.1f}% | [{ci_low_ans * 100:+.1f}%, {ci_high_ans * 100:+.1f}%] | {b_ans} / {c_ans} | {p_ans:.4f} |",
         f"| Strict Accuracy (`pass_strict`) | {diff_st * 100:+.1f}% | [{ci_low_st * 100:+.1f}%, {ci_high_st * 100:+.1f}%] | {b_st} / {c_st} | {p_st:.4f} |",
         f"| Hallucination Rate | {diff_hall * 100:+.1f}% | [{ci_low_hall * 100:+.1f}%, {ci_high_hall * 100:+.1f}%] | {b_h} / {c_h} | {p_hall:.4f} |",
+        f"| False Abstain Rate | {diff_fa * 100:+.1f}% | [{ci_low_fa * 100:+.1f}%, {ci_high_fa * 100:+.1f}%] | {b_fa} / {c_fa} | {p_fa:.4f} |",
         "",
     ]
 

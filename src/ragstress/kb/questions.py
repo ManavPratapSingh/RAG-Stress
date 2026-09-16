@@ -21,6 +21,8 @@ class Question(BaseModel):
     text: str
     gold_value: str
     gold_fact_id: str
+    entity_name: str | None = None
+    attribute_label: str | None = None
 
 
 ATTRIBUTE_LABELS: dict[str, str] = {

@@ -12,12 +12,13 @@ from ragstress.gen.prompts import PROMPT_VERSION, SYSTEM_PROMPT, render_user_mes
 from ragstress.gen.schema import SUBMIT_ANSWER_SCHEMA, GenResult
 from ragstress.gen.scripted import ScriptedGenerator
 from ragstress.graders.item_grader import grade_item
-from ragstress.kb.facts import BaseKB, Passage
+from ragstress.interventions.base import get_intervention
+from ragstress.kb.facts import BaseKB
 from ragstress.retrieval.bm25 import BM25Index
 from ragstress.retrieval.chunker import Chunk
 from ragstress.retrieval.metrics import compute_retrieval_metrics
 from ragstress.runner.schema import ItemTrace, ResultRow, RunManifest
-from ragstress.stress.builder import build_context
+from ragstress.stress.builder import Context, build_context
 from ragstress.suites.schema import SuiteItem
 
 
@@ -38,6 +39,7 @@ def _evaluate_single_item(
     fact_map: dict[str, Any],
     run_id: str,
     bm25: BM25Index,
+    intervention: Any,
 ) -> tuple[ItemTrace, ResultRow]:
     q = q_map[item.question_id]
     condition = item.condition
@@ -55,7 +57,6 @@ def _evaluate_single_item(
             seed=item.seed + trial,
             item_id=item.item_id,
         )
-        passages: list[Passage] = list(ctx.passages)
         gold_support_ids = ctx.gold_support_ids
         item_kind = (
             "unanswerable"
@@ -73,7 +74,6 @@ def _evaluate_single_item(
             if str(lbl.get("role", "")).startswith("distractor")
             for f in lbl.get("facts", [])
         ]
-        context_labels = ctx.labels
     else:
         # Mode B retrieval
         k_ret = condition.k_retrieve or 5
@@ -93,11 +93,11 @@ def _evaluate_single_item(
 
         # Map retrieved passages
         p_map = {p.doc_id: p for p in kb.passages}
-        passages = [p_map[doc_id] for doc_id in hit_ids if doc_id in p_map]
+        passages_b = [p_map[doc_id] for doc_id in hit_ids if doc_id in p_map]
         twin_val = None
         gold_vals = [q.gold_value]
 
-        for p in passages:
+        for p in passages_b:
             for f in p.facts:
                 if f.value != q.gold_value:
                     distractor_vals.append(f.value)
@@ -110,7 +110,22 @@ def _evaluate_single_item(
             "retrieval_mrr": m.mrr,
             "retrieval_ndcg": m.ndcg,
         }
-        context_labels = [p.model_dump() for p in passages]
+        ctx = Context(
+            passages=passages_b,
+            labels=[
+                {"doc_id": chunk.doc_id, "score": chunk.score, "rank": chunk.rank} for chunk in hits
+            ],
+            gold_support_ids=gold_support_ids,
+            relevant_ids=gold_support_ids,
+            gold_values=gold_vals,
+        )
+
+    # Apply intervention context transform
+    transformed_ctx = intervention.transform_context(ctx, q)
+    passages = list(transformed_ctx.passages)
+    context_labels = (
+        transformed_ctx.labels if transformed_ctx.labels else [p.model_dump() for p in passages]
+    )
 
     gold_val = q.gold_value
     q_fact = fact_map.get(q.gold_fact_id)
@@ -118,6 +133,8 @@ def _evaluate_single_item(
 
     # Prompt rendering
     user_msg = render_user_message(passages, q.text)
+    extra_sys = intervention.extra_system()
+    effective_sys = f"{SYSTEM_PROMPT}\n\n{extra_sys}".strip() if extra_sys else SYSTEM_PROMPT
 
     # Generator setup (clone scripted if needed)
     if isinstance(generator, ScriptedGenerator):
@@ -130,7 +147,8 @@ def _evaluate_single_item(
     else:
         gen_under_test = generator
 
-    gen_res: GenResult = gen_under_test.generate(SYSTEM_PROMPT, user_msg, SUBMIT_ANSWER_SCHEMA)
+    raw_gen_res: GenResult = gen_under_test.generate(effective_sys, user_msg, SUBMIT_ANSWER_SCHEMA)
+    gen_res = intervention.postprocess(transformed_ctx, raw_gen_res)
 
     # Grade
     graded = grade_item(
@@ -154,7 +172,7 @@ def _evaluate_single_item(
         trial=trial,
         generator=getattr(generator, "name", "unknown"),
         prompt_version=PROMPT_VERSION,
-        intervention="baseline",
+        intervention=intervention.name,
         condition=condition.model_dump(mode="json"),
         context=[
             p.model_dump(mode="json") if hasattr(p, "model_dump") else p.__dict__ for p in passages
@@ -181,7 +199,7 @@ def _evaluate_single_item(
         k_retrieve=condition.k_retrieve,
         retriever="bm25" if condition.mode == "B" else None,
         generator=getattr(generator, "name", "unknown"),
-        intervention="baseline",
+        intervention=intervention.name,
         pass_answer=graded.pass_answer,
         pass_strict=graded.pass_strict,
         provenance=graded.provenance,
@@ -218,6 +236,7 @@ def run_suite(
     output_dir: Path | str,
     concurrency: int = 4,
     trials: int = 1,
+    intervention: str | Any = "baseline",
     run_id: str | None = None,
 ) -> Path:
     """Execute a benchmark suite across items and trials, saving traces and results."""
@@ -225,6 +244,8 @@ def run_suite(
     out_path.mkdir(parents=True, exist_ok=True)
     traces_dir = out_path / "traces"
     traces_dir.mkdir(parents=True, exist_ok=True)
+
+    interv_obj = get_intervention(intervention) if isinstance(intervention, str) else intervention
 
     started_at = datetime.now(UTC).isoformat()
     active_run_id = run_id or f"run_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}_{items[0].seed}"
@@ -266,6 +287,7 @@ def run_suite(
                     fact_map,
                     active_run_id,
                     bm25,
+                    interv_obj,
                 ): (it.item_id, trial)
                 for it, trial in tasks
             }
@@ -284,6 +306,7 @@ def run_suite(
                 fact_map,
                 active_run_id,
                 bm25,
+                interv_obj,
             )
             all_traces.append(trace)
             all_rows.append(row)
@@ -326,6 +349,7 @@ def run_suite(
         total_items=len(all_rows),
         concurrency=concurrency,
         trials=trials,
+        intervention=interv_obj.name,
         started_at=started_at,
         finished_at=finished_at,
     )

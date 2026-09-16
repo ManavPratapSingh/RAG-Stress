@@ -192,6 +192,12 @@ def run_command_cli(
     output_dir: Path = typer.Option(Path("runs/latest"), "--out", "-o", help="Output directory"),
     concurrency: int = typer.Option(4, "--concurrency", "-c", help="Worker concurrency"),
     trials: int = typer.Option(1, "--trials", "-t", help="Number of trials per item"),
+    intervention: str = typer.Option(
+        "baseline",
+        "--intervention",
+        "-i",
+        help="Intervention to evaluate (baseline, reorder_edges, lexical_rerank, check_prompt, score_threshold)",
+    ),
     seed: int = typer.Option(42, "--seed", "-s", help="Seed if generating base KB"),
     kb_dir: Path = typer.Option(Path("data/kb"), "--kb-dir", help="Path to base KB directory"),
 ) -> None:
@@ -262,6 +268,7 @@ def run_command_cli(
         output_dir=output_dir,
         concurrency=concurrency,
         trials=trials,
+        intervention=intervention,
     )
     typer.secho(
         f"Benchmark run complete. Results and traces written to: {run_path}", fg=typer.colors.GREEN

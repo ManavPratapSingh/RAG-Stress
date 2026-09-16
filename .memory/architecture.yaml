@@ -52,5 +52,12 @@ pipeline_stages:
       - paired bootstrap & McNemar test
       - lost-in-the-middle score
       - report markdown & CLI compare
-    status: planned (Phase 7)
+    status: implemented (Phase 7)
+  interventions:
+    owns:
+      - edge reordering
+      - lexical reranking
+      - check prompt injection
+      - score threshold abstention
+    status: planned (Phase 8)
 
