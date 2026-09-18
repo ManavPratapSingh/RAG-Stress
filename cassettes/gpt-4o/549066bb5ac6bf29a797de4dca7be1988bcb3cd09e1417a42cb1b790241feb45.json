@@ -1,0 +1,30 @@
+{
+  "recorded_with": {
+    "date": "2026-10-15T12:00:00+00:00",
+    "intervention": "baseline",
+    "model": "gpt-4o"
+  },
+  "result": {
+    "format_error": null,
+    "latency_ms": 553.1,
+    "output": {
+      "abstain": false,
+      "answer": null,
+      "citations": [
+        "doc-jz7wsz",
+        "doc-4toun2"
+      ],
+      "conflict": true,
+      "conflicting_values": [
+        "4500.00",
+        "8 months"
+      ]
+    },
+    "raw": "{\"name\": \"submit_answer\", \"arguments\": {\"conflict\": true}}",
+    "usage": {
+      "cost_usd": 0.0,
+      "input_tokens": 913,
+      "output_tokens": 25
+    }
+  }
+}

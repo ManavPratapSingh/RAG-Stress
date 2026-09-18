@@ -59,5 +59,12 @@ pipeline_stages:
       - lexical reranking
       - check prompt injection
       - score threshold abstention
-    status: planned (Phase 8)
+    status: implemented (Phase 8)
+  packaging_and_benchmarks:
+    owns:
+      - Dockerfile (non-root, offline replay)
+      - Makefile pipeline targets
+      - GitHub Actions CI workflow
+      - Committed 2-model benchmark cassettes
+    status: planned (Phase 9)
 

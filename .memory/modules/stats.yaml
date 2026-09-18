@@ -18,3 +18,4 @@ invariants:
   - "Wilson intervals are clamped to [0.0, 1.0] and return (0.0, 0.0) when n=0."
   - "Bootstrap resampling must use an explicit integer seed for replay determinism."
   - "McNemar test requires equal-length paired input arrays; discordance sum 0 yields p=1.0."
+

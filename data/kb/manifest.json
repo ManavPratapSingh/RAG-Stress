@@ -1,0 +1,11 @@
+{
+  "fact_count": 600,
+  "files": {
+    "facts.jsonl": "2cfbb0c5f5d4f1d20b126a574087655d98c33ecdebf3f68a91db4f04cb4ab37b",
+    "passages.jsonl": "8ed06af01ee64e0a8a1e2fdb66572340eb0281f2e65a2bc62452c8657555dcad",
+    "questions.jsonl": "9bdbf0191339bb28dec95b785e0746f1f83472f48c6da8f9986c92abe23686f2"
+  },
+  "passage_count": 300,
+  "question_count": 600,
+  "seed": 42
+}

@@ -1,6 +1,6 @@
-active_phase: "Phase 7: Analysis & report"
+active_phase: "Phase 9: Packaging, CI, real-model runs"
 status: "completed"
-next_phase: "Phase 8: Interventions: do mitigations actually help?"
+next_phase: "Complete (Project Done)"
 
 completed_artifacts:
   - Phase 1 KB & Normalizer (52 tests)
@@ -9,22 +9,19 @@ completed_artifacts:
   - Phase 4 Generator Under Test (4 tests)
   - Phase 5 Graders & Taxonomy (7 tests)
   - Phase 6 Suites & Runner (4 tests)
-  - src/ragstress/stats/wilson.py
-  - src/ragstress/stats/mcnemar.py
-  - src/ragstress/stats/bootstrap.py
-  - src/ragstress/stats/position.py
-  - src/ragstress/report/pricing.py
-  - src/ragstress/report/generator.py
-  - src/ragstress/report/compare.py
-  - src/ragstress/cli.py (report, compare commands)
-  - config/models.yaml & config/defaults.yaml
-  - tests/unit/test_stats.py (6 tests)
-  - tests/unit/test_report.py (4 tests)
-  - tests/unit/test_golden_report.py (1 test, total 92 passing)
+  - Phase 7 Stats & Reporting (11 tests)
+  - Phase 8 Interventions & Mitigations (7 tests)
+  - Phase 9 Packaging, CI & Benchmarks (1 test, total 100 tests passing)
+  - Dockerfile (non-root multi-stage)
+  - .github/workflows/ci.yml (full CI pipeline)
+  - Makefile (setup, test, lint, format, typecheck, gen-kb, validate, bench-replay, bench, report, docker)
+  - src/ragstress/suites/hardness.py (distractor hardness, length parity, opaque ID leakage checks)
+  - scripts/record_frontier_cassettes.py (offline cassette recorder for core & smoke suites)
+  - cassettes/gpt-4o-mini and cassettes/gpt-4o (1178 cassettes each for baseline & interventions)
+  - README.md (comprehensive overview, architecture diagram, headline benchmark comparisons, guides, limitations)
+  - docs/explainer/09-packaging-and-benchmarks.md
 
 key_assumptions:
-  - Wilson 95% score intervals provide reliable binomial proportion coverage near boundaries (0% and 100%).
-  - Paired exact McNemar tests condition on discordant pairs to maximize statistical power.
-  - Closed-book parametric leakage is strictly unanswerable items where the model asserted an answer matching the gold value.
-  - CLI compare command strictly refuses on item-set mismatch to prevent invalid paired statistics.
-
+  - Offline cassette replay ensures zero network access, zero secret exposure, and byte-identical outputs in CI.
+  - Replay of 1,120 items finishes in < 5 seconds with zero cost per commit.
+  - Distractor hardness medians >= 0.6 confirm non-random distractors provide robust lexical/dense stress.

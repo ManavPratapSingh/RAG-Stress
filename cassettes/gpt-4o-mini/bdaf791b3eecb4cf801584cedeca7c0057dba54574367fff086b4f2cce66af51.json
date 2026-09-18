@@ -1,0 +1,26 @@
+{
+  "recorded_with": {
+    "date": "2026-10-15T12:00:00+00:00",
+    "intervention": "baseline",
+    "model": "gpt-4o-mini"
+  },
+  "result": {
+    "format_error": null,
+    "latency_ms": 352.7,
+    "output": {
+      "abstain": false,
+      "answer": "1925.00",
+      "citations": [
+        "doc-sqsce3"
+      ],
+      "conflict": false,
+      "conflicting_values": []
+    },
+    "raw": "{\"name\": \"submit_answer\", \"arguments\": {\"answer\": \"1925.00\"}}",
+    "usage": {
+      "cost_usd": 0.0,
+      "input_tokens": 836,
+      "output_tokens": 25
+    }
+  }
+}

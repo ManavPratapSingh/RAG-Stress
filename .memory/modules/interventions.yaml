@@ -1,0 +1,18 @@
+name: interventions
+path: src/ragstress/interventions/
+purpose: "Pluggable mitigation pipelines for evaluating context transforms, prompt directives, and retrieval guardrails on identical benchmark queries."
+key_files:
+  - path: src/ragstress/interventions/base.py
+    symbols:
+      - Intervention
+      - BaselineIntervention
+      - ReorderEdgesIntervention
+      - LexicalRerankIntervention
+      - CheckPromptIntervention
+      - ScoreThresholdIntervention
+      - get_intervention
+    role: "Defines 3-hook lifecycle protocol (transform_context, extra_system, postprocess) and implementations for baseline, reorder_edges, lexical_rerank, check_prompt, and score_threshold."
+invariants:
+  - "Interventions must evaluate on identical query items to allow valid paired McNemar and bootstrap difference tests."
+  - "extra_system instructions are appended after the base prompt and must never modify ground-truth rules R1-R6."
+  - "ScoreThresholdIntervention defaults to threshold=0.5 and forces abstain=True if max retrieval score in ctx.labels is below threshold."

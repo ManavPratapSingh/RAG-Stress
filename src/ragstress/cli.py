@@ -198,6 +198,7 @@ def run_command_cli(
         "-i",
         help="Intervention to evaluate (baseline, reorder_edges, lexical_rerank, check_prompt, score_threshold)",
     ),
+    run_id: str | None = typer.Option(None, "--run-id", help="Optional explicit run ID"),
     seed: int = typer.Option(42, "--seed", "-s", help="Seed if generating base KB"),
     kb_dir: Path = typer.Option(Path("data/kb"), "--kb-dir", help="Path to base KB directory"),
 ) -> None:
@@ -269,6 +270,7 @@ def run_command_cli(
         concurrency=concurrency,
         trials=trials,
         intervention=intervention,
+        run_id=run_id,
     )
     typer.secho(
         f"Benchmark run complete. Results and traces written to: {run_path}", fg=typer.colors.GREEN
@@ -333,6 +335,222 @@ def compare_command(
     except Exception as e:
         typer.secho(f"Error comparing runs: {e}", fg=typer.colors.RED)
         raise typer.Exit(code=1) from e
+
+
+@app.command("hardness")
+def hardness_command(
+    suite_path: Path = typer.Argument(..., help="Path to suite .jsonl file"),
+    kb_dir: Path = typer.Option(Path("data/kb"), "--kb-dir", help="Path to base KB directory"),
+    seed: int = typer.Option(42, "--seed", "-s", help="Seed if generating base KB"),
+) -> None:
+    """Evaluate distractor hardness and ID/style leakage (SPEC §6.2, §13)."""
+    from ragstress.kb.facts import BaseKB, Fact, Passage
+    from ragstress.kb.questions import Question
+    from ragstress.suites.hardness import evaluate_suite_hardness
+    from ragstress.suites.schema import SuiteItem
+
+    if not suite_path.exists():
+        typer.secho(f"Error: suite file {suite_path} does not exist", fg=typer.colors.RED)
+        raise typer.Exit(code=1)
+
+    items = [
+        SuiteItem.model_validate_json(line)
+        for line in suite_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+
+    # Load KB
+    if (kb_dir / "passages.jsonl").exists():
+        passages = [
+            Passage.model_validate_json(line)
+            for line in (kb_dir / "passages.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        facts = [
+            Fact.model_validate_json(line)
+            for line in (kb_dir / "facts.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        questions = [
+            Question.model_validate_json(line)
+            for line in (kb_dir / "questions.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        kb = BaseKB(passages=passages, facts=facts, questions=questions)
+    else:
+        passages, facts, questions = generate_base_kb(seed=seed)
+        kb = BaseKB(passages=passages, facts=facts, questions=questions)
+
+    rep = evaluate_suite_hardness(items, kb)
+    typer.echo(f"\n--- Suite Hardness & Leakage Report: {suite_path} ---")
+    typer.echo(f"Analyzed items: {rep.total_items_analyzed}")
+    typer.echo(
+        f"Gold word count mean: {rep.gold_word_count_mean:.1f} | Distractor word count mean: {rep.distractor_word_count_mean:.1f}"
+    )
+    typer.echo(
+        f"Length diff ratio: {rep.word_count_diff_ratio:.2%} (Pass <= 10%: {'YES' if rep.length_balanced else 'NO'})"
+    )
+    typer.echo(
+        f"Doc ID format valid: {'YES' if rep.id_format_valid else 'NO'} | ID leakage detected: {'YES' if rep.id_leakage_detected else 'NO'}"
+    )
+    typer.echo("\nDistractor Hardness Breakdown:")
+    typer.echo(
+        f"  {'Distractor Type':<25} | {'Count':<6} | {'BM25 Median':<12} | {'Dense Median':<12}"
+    )
+    typer.echo("  " + "-" * 62)
+    for s in rep.distractor_hardness:
+        typer.echo(
+            f"  {s.distractor_type:<25} | {s.count:<6} | {s.bm25_median:<12.3f} | {s.dense_median:<12.3f}"
+        )
+    typer.echo("")
+    if rep.passed:
+        typer.secho("Hardness & ID leakage check PASSED", fg=typer.colors.GREEN)
+    else:
+        typer.secho("Hardness & ID leakage check FAILED", fg=typer.colors.RED)
+        raise typer.Exit(code=1)
+
+
+@app.command("retrieval-eval")
+def retrieval_eval_command(
+    suite_path: Path = typer.Option(
+        Path("data/suites/core.jsonl"), "--suite", help="Path to suite file"
+    ),
+    retriever_type: str = typer.Option(
+        "bm25", "--retriever", help="Retriever type: bm25, dense, or hybrid"
+    ),
+    embedder_type: str = typer.Option("hash", "--embedder", help="Embedder type: hash or minilm"),
+    store_type: str = typer.Option("flat", "--store", help="Store type: flat or qdrant"),
+    k_values: str = typer.Option("3,5,10", "--k", help="Comma-separated k values (e.g. 3,5,10)"),
+    kb_dir: Path = typer.Option(Path("data/kb"), "--kb-dir", help="Path to base KB directory"),
+    seed: int = typer.Option(42, "--seed", "-s", help="Seed if generating base KB"),
+) -> None:
+    """Evaluate retrieval metrics (Hit, Recall, MRR, NDCG) across a suite (SPEC §5.5, §13)."""
+    from ragstress.kb.facts import BaseKB, Fact, Passage
+    from ragstress.kb.questions import Question
+    from ragstress.retrieval.bm25 import BM25Index
+    from ragstress.retrieval.chunker import chunk_passage
+    from ragstress.retrieval.embedders import HashEmbedder
+    from ragstress.retrieval.metrics import compute_retrieval_metrics
+    from ragstress.retrieval.stores import FlatStore
+    from ragstress.suites.schema import SuiteItem
+
+    if not suite_path.exists():
+        typer.secho(f"Error: suite file {suite_path} does not exist", fg=typer.colors.RED)
+        raise typer.Exit(code=1)
+
+    items = [
+        SuiteItem.model_validate_json(line)
+        for line in suite_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+
+    # Load KB
+    if (kb_dir / "passages.jsonl").exists():
+        passages = [
+            Passage.model_validate_json(line)
+            for line in (kb_dir / "passages.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        facts = [
+            Fact.model_validate_json(line)
+            for line in (kb_dir / "facts.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        questions = [
+            Question.model_validate_json(line)
+            for line in (kb_dir / "questions.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        kb = BaseKB(passages=passages, facts=facts, questions=questions)
+    else:
+        passages, facts, questions = generate_base_kb(seed=seed)
+        kb = BaseKB(passages=passages, facts=facts, questions=questions)
+
+    # Index base passages
+    chunks = []
+    for p in kb.passages:
+        chunks.extend(chunk_passage(p.doc_id, p.title, p.text))
+
+    ks = [int(k.strip()) for k in k_values.split(",") if k.strip()]
+    max_k = max(ks) if ks else 10
+
+    q_map = {q.question_id: q for q in kb.questions}
+    fact_map = {f.fact_id: f for f in kb.facts}
+
+    # Setup retriever
+    embedder = HashEmbedder()
+    store = FlatStore()
+    bm25 = BM25Index()
+
+    if retriever_type in ("bm25", "hybrid"):
+        bm25.index(chunks)
+    if retriever_type in ("dense", "hybrid"):
+        vectors = embedder.embed([c.text for c in chunks])
+        store.add([c.doc_id for c in chunks], vectors)
+
+    # Evaluate across questions
+    evaluated = 0
+    k_metrics: dict[int, dict[str, list[float]]] = {
+        k: {"hit": [], "recall": [], "mrr": [], "ndcg": []} for k in ks
+    }
+
+    # Find unique answerable questions in the suite
+    seen_q = set()
+    for it in items:
+        if not it.condition.answerable:
+            continue
+        if it.question_id in seen_q:
+            continue
+        seen_q.add(it.question_id)
+        q = q_map.get(it.question_id)
+        if not q:
+            continue
+        fact = fact_map.get(q.gold_fact_id)
+        if not fact:
+            continue
+
+        relevant_doc_ids = [
+            p.doc_id for p in kb.passages if any(f.fact_id == fact.fact_id for f in p.facts)
+        ]
+        if not relevant_doc_ids:
+            continue
+
+        if retriever_type == "bm25":
+            res = bm25.search(q.text, k=max_k)
+            retrieved_ids = [r.doc_id for r in res]
+        elif retriever_type == "dense":
+            q_vec = embedder.embed([q.text])[0]
+            res_store = store.search(q_vec, k=max_k)
+            retrieved_ids = [doc_id for doc_id, _ in res_store]
+        else:  # hybrid
+            from ragstress.retrieval.hybrid import hybrid_rrf
+
+            res_b = bm25.search(q.text, k=max_k * 2)
+            q_vec = embedder.embed([q.text])[0]
+            res_s = store.search(q_vec, k=max_k * 2)
+            ids_b = [r.doc_id for r in res_b]
+            ids_d = [doc_id for doc_id, _ in res_s]
+            hybrid_res = hybrid_rrf([ids_b, ids_d], k=max_k)
+            retrieved_ids = [doc_id for doc_id, _ in hybrid_res]
+
+        evaluated += 1
+        for k in ks:
+            m = compute_retrieval_metrics(retrieved_ids, set(relevant_doc_ids), k=k)
+            k_metrics[k]["hit"].append(m.hit)
+            k_metrics[k]["recall"].append(m.recall)
+            k_metrics[k]["mrr"].append(m.mrr)
+            k_metrics[k]["ndcg"].append(m.ndcg)
+
+    typer.echo(f"\n--- Retrieval Evaluation ({retriever_type}, evaluated {evaluated} queries) ---")
+    typer.echo(f"{'k':<4} | {'Hit@k':<10} | {'Recall@k':<10} | {'MRR@k':<10} | {'NDCG@k':<10}")
+    typer.echo("-" * 52)
+    for k in ks:
+        hit = sum(k_metrics[k]["hit"]) / evaluated if evaluated else 0.0
+        rec = sum(k_metrics[k]["recall"]) / evaluated if evaluated else 0.0
+        mrr = sum(k_metrics[k]["mrr"]) / evaluated if evaluated else 0.0
+        ndcg = sum(k_metrics[k]["ndcg"]) / evaluated if evaluated else 0.0
+        typer.echo(f"{k:<4} | {hit:<10.3f} | {rec:<10.3f} | {mrr:<10.3f} | {ndcg:<10.3f}")
+    typer.echo("")
 
 
 def gen_kb_standalone() -> None:

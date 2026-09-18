@@ -11,10 +11,8 @@ build/
 .coverage
 htmlcov/
 .mypy_cache/
-data/
 runs/
 traces/
-cassettes/
 
 
 # Meta documentation and agent tooling

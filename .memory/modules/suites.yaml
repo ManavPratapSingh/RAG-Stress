@@ -21,3 +21,4 @@ known_constraints:
   - Question split assignment is deterministic via SHA-256 hash of question_id.
   - Smoke suite has ~60 items, core suite has ~1,120 items.
   - Oracle generator must score 100% pass_strict across all solvable and unanswerable items.
+

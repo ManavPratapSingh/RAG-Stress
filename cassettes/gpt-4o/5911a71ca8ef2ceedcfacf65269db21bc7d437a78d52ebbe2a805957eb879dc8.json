@@ -1,0 +1,26 @@
+{
+  "recorded_with": {
+    "date": "2026-10-15T12:00:00+00:00",
+    "intervention": "baseline",
+    "model": "gpt-4o"
+  },
+  "result": {
+    "format_error": null,
+    "latency_ms": 550.9,
+    "output": {
+      "abstain": false,
+      "answer": "36 months",
+      "citations": [
+        "doc-gs57ad"
+      ],
+      "conflict": false,
+      "conflicting_values": []
+    },
+    "raw": "{\"name\": \"submit_answer\", \"arguments\": {\"answer\": \"36 months\"}}",
+    "usage": {
+      "cost_usd": 0.0,
+      "input_tokens": 881,
+      "output_tokens": 25
+    }
+  }
+}

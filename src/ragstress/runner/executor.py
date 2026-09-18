@@ -248,7 +248,7 @@ def run_suite(
     interv_obj = get_intervention(intervention) if isinstance(intervention, str) else intervention
 
     started_at = datetime.now(UTC).isoformat()
-    active_run_id = run_id or f"run_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}_{items[0].seed}"
+    active_run_id = run_id or (f"run_{items[0].seed}" if items else "run_default")
 
     q_map = {q.question_id: q for q in kb.questions}
     fact_map = {f.fact_id: f for f in kb.facts}

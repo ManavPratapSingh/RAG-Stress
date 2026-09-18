@@ -1,0 +1,24 @@
+{
+  "recorded_with": {
+    "date": "2026-10-15T12:00:00+00:00",
+    "intervention": "check_prompt",
+    "model": "gpt-4o-mini"
+  },
+  "result": {
+    "format_error": null,
+    "latency_ms": 258.0,
+    "output": {
+      "abstain": true,
+      "answer": null,
+      "citations": [],
+      "conflict": false,
+      "conflicting_values": []
+    },
+    "raw": "{\"name\": \"submit_answer\", \"arguments\": {\"abstain\": true}}",
+    "usage": {
+      "cost_usd": 0.0,
+      "input_tokens": 435,
+      "output_tokens": 25
+    }
+  }
+}

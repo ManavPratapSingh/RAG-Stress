@@ -26,3 +26,4 @@ known_constraints:
   - Results and traces must be sorted by (item_id, trial) to guarantee byte-identical outputs across runs.
   - No wall-clock timestamps in traces or results.jsonl (timestamps live exclusively in manifest.json).
   - Mode B uses BM25Index to query top-k and measures retrieval metrics per item.
+

@@ -15,3 +15,4 @@ invariants:
   - "Parametric leakage is strictly defined as unanswerable items where answer == gold value and the model did not abstain."
   - "compare_runs raises ValueError and exits non-zero if item sets between Run A and Run B do not match exactly."
   - "Unknown model generators fall back to None for cost computation with prominent markdown notice."
+

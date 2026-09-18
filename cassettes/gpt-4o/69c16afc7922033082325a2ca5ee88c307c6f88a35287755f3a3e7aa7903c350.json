@@ -1,0 +1,25 @@
+{
+  "recorded_with": {
+    "date": "2026-10-15T12:00:00+00:00",
+    "model": "gpt-4o"
+  },
+  "result": {
+    "format_error": null,
+    "latency_ms": 437.5,
+    "output": {
+      "abstain": false,
+      "answer": "46 days",
+      "citations": [
+        "doc-0099"
+      ],
+      "conflict": false,
+      "conflicting_values": []
+    },
+    "raw": "{\"name\": \"submit_answer\", \"arguments\": {\"answer\": \"46 days\"}}",
+    "usage": {
+      "cost_usd": 0.0,
+      "input_tokens": 154,
+      "output_tokens": 25
+    }
+  }
+}
