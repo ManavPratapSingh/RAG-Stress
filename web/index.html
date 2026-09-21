@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAG-Stress | Seed-Deterministic RAG Hallucination & Retrieval Evaluation Harness</title>
+  <meta name="description" content="Public interactive workbench for RAG-Stress: an end-to-end evaluation harness stress-testing LLM generators and retrievers against distractor noise, knowledge conflicts, position bias, and multi-hop reasoning.">
+  <link rel="stylesheet" href="style.css">
+  <!-- Zero external framework dependencies; 100% offline capable -->
+</head>
+<body>
+
+  <!-- Masthead -->
+  <header class="masthead">
+    <div class="masthead-inner">
+      <div class="brand">
+        <span class="brand-badge">RAG-STRESS</span>
+        <span class="brand-title">Deterministic Evaluation Harness</span>
+      </div>
+      <div class="masthead-meta">
+        <div class="status-indicator">
+          <span class="status-dot"></span>
+          <span>100% Offline Replayable</span>
+        </div>
+        <span>Core Suite: 1,120 items</span>
+        <a href="https://github.com" target="_blank" class="btn-github">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+          </svg>
+          View Source Code
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Hero / The Problem -->
+    <section class="hero">
+      <div class="hero-tag">Automated Evaluation & Reliability Engineering</div>
+      <h1>Exposing RAG Hallucinations Through Controlled Systematic Stress</h1>
+      <p>
+        Standard RAG benchmarks assume single-document relevance, zero distractor noise, and cooperative sources. In production, enterprise retrieval surfaces conflicting drafts, outdated policies, and 50+ noise passages. RAG-Stress quantifies exactly where and why retrieval-augmented systems break.
+      </p>
+
+      <div class="thesis-box">
+        <div class="thesis-item">
+          <h4>0% Pre-Training Leakage</h4>
+          <p>Built over a seed-deterministic synthetic KB of 150 entities and 600 typed facts using pronounceable pseudo-words that cannot exist in foundation model pre-training.</p>
+        </div>
+        <div class="thesis-item">
+          <h4>Deterministic Grading</h4>
+          <p>Zero LLM-as-a-judge. All answers, temporal conflicts, multi-document citations, and abstentions are verified via exact structured normalizers.</p>
+        </div>
+        <div class="thesis-item">
+          <h4>Paired Statistical Power</h4>
+          <p>Identical query items act as their own controls, evaluated with McNemar's exact test and 95% bootstrap difference intervals to eliminate question selection variance.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 1: System Pipeline Architecture -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">End-to-End Evaluation Architecture</h2>
+        <div class="section-desc">Six decoupled, byte-reproducible phases executing from synthetic generation to paired hypothesis testing.</div>
+      </div>
+
+      <div class="pipeline-flow">
+        <div class="pipeline-steps">
+          <div class="step-card">
+            <div class="step-num">PHASE 01</div>
+            <div class="step-title">Synthetic KB</div>
+            <div class="step-detail">150 entities, 600 facts, 300 passages. Byte-identical seed determinism with collision-proof attributes.</div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">PHASE 02</div>
+            <div class="step-title">Retrieval Stack</div>
+            <div class="step-detail">Pure-Python BM25, deterministic hash embedder, flat vector store, and reciprocal rank fusion (RRF).</div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">PHASE 03</div>
+            <div class="step-title">Stress Engine</div>
+            <div class="step-detail">Injects near-miss distractors, temporal/authority conflict twins, opaque doc IDs, and positional permutations.</div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">PHASE 04</div>
+            <div class="step-title">Structured Replay</div>
+            <div class="step-detail">Forced JSON tool-calls with SHA-256 content-addressed cassette recording for 100% offline regression CI.</div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">PHASE 05</div>
+            <div class="step-title">Graders & Taxonomy</div>
+            <div class="step-detail">Normalizes currencies, dates, and durations. Classifies errors into 8 mutually exclusive taxonomy bins.</div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">PHASE 06</div>
+            <div class="step-title">Paired Analytics</div>
+            <div class="step-detail">Wilson score intervals, paired McNemar exact tests, and Lost-in-the-Middle positional penalty scores.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Head-to-Head Frontier Benchmark -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Head-to-Head Frontier Benchmark: GPT-4o vs GPT-4o-mini</h2>
+        <div class="section-desc">Evaluated on the exact same 1,120 core benchmark items across distractor noise sweeps, knowledge conflicts, and unanswerable queries.</div>
+      </div>
+
+      <div class="bench-grid">
+        <div class="card">
+          <h3 style="font-size: 16px; margin-bottom: 16px;">Core Metrics Comparison (1,120 Items)</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Evaluation Dimension</th>
+                <th>GPT-4o (Frontier)</th>
+                <th>GPT-4o-mini (Small)</th>
+                <th>Delta</th>
+              </tr>
+            </thead>
+            <tbody id="bench-table-body">
+              <!-- Dynamically populated from web/data.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card matrix-container">
+          <h3 style="font-size: 16px; margin-bottom: 8px;">McNemar Discordance Matrix</h3>
+          <div id="mcnemar-matrix-container">
+            <!-- Dynamically populated from web/data.js -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Interactive Stress Factor Laboratory -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Interactive Stress Factor Laboratory</h2>
+        <div class="section-desc">Explore how distractor noise load, context position, and knowledge conflicts degrade model comprehension and adoption.</div>
+      </div>
+
+      <div class="lab-container">
+        <!-- 3.1 Distractor Noise Sweep -->
+        <div class="lab-controls">
+          <div class="control-group">
+            <label class="control-label">Distractor Noise Load (k Passages):</label>
+            <div class="pill-group">
+              <button class="pill-btn noise-btn" data-k="0">k = 0</button>
+              <button class="pill-btn noise-btn" data-k="5">k = 5</button>
+              <button class="pill-btn noise-btn active" data-k="10">k = 10</button>
+              <button class="pill-btn noise-btn" data-k="25">k = 25</button>
+              <button class="pill-btn noise-btn" data-k="50">k = 50</button>
+            </div>
+          </div>
+
+          <div class="control-group" style="margin-left: auto;">
+            <label class="control-label">Accuracy at Selected k:</label>
+            <div style="font-family: var(--font-mono); font-size: 14px;">
+              GPT-4o: <span id="readout-4o" style="color: var(--accent-cyan); font-weight:700;">100.0%</span> |
+              GPT-4o-mini: <span id="readout-mini" style="color: var(--accent-rose); font-weight:700;">76.7%</span> |
+              Gap: <span id="readout-gap" style="color: var(--accent-amber); font-weight:700;">+23.3%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-wrapper" id="chart-wrapper">
+          <!-- Dynamically populated SVG with reliable DOM replacement -->
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
+          <div style="font-size: 13px; color: var(--text-secondary); max-width: 650px;" id="noise-finding-text">
+            <strong>At k=10:</strong> GPT-4o retains 100.0% accuracy, while GPT-4o-mini drops to 76.7% as distractor adoption reaches 23.3%.
+          </div>
+          <div style="display: flex; gap: 16px; font-family: var(--font-mono); font-size: 12px;">
+            <span style="color: var(--accent-cyan);">&#9632; GPT-4o (Frontier)</span>
+            <span style="color: var(--accent-rose);">&#9632; GPT-4o-mini (Small)</span>
+          </div>
+        </div>
+
+        <!-- Dynamic Metric Cards for Selected k -->
+        <div class="noise-metrics-grid">
+          <div class="noise-metric-card">
+            <div class="metric-label">GPT-4o Accuracy</div>
+            <div class="metric-val" id="card-acc-4o" style="color: var(--accent-cyan);">100.0%</div>
+            <div class="metric-sub" id="card-sub-4o">95% CI: [94.0%, 100.0%]</div>
+          </div>
+          <div class="noise-metric-card">
+            <div class="metric-label">GPT-4o-mini Accuracy</div>
+            <div class="metric-val" id="card-acc-mini" style="color: var(--accent-rose);">76.7%</div>
+            <div class="metric-sub" id="card-sub-mini">95% CI: [64.6%, 85.6%]</div>
+          </div>
+          <div class="noise-metric-card">
+            <div class="metric-label">Distractor Adoption (Mini)</div>
+            <div class="metric-val" id="card-distractor-mini" style="color: var(--accent-amber);">23.3%</div>
+            <div class="metric-sub">Adopting distractor facts</div>
+          </div>
+          <div class="noise-metric-card">
+            <div class="metric-label">Frontier Margin</div>
+            <div class="metric-val" id="card-margin" style="color: var(--accent-emerald);">+23.3 pts</div>
+            <div class="metric-sub">Advantage of GPT-4o</div>
+          </div>
+        </div>
+
+        <!-- 3.2 Position Bias / Lost in Middle Simulator -->
+        <div class="position-lab">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <h4 style="font-size: 15px; font-weight: 700;">Context Position Bias: "Lost-in-the-Middle"</h4>
+              <div style="font-size: 13px; color: var(--text-secondary);">Select the gold evidence position within 10–30 retrieved passages:</div>
+            </div>
+            <div class="pill-group">
+              <button class="pill-btn pos-btn" data-pos="top">Top of Context</button>
+              <button class="pill-btn pos-btn active" data-pos="middle">Middle of Context</button>
+              <button class="pill-btn pos-btn" data-pos="bottom">Bottom of Context</button>
+            </div>
+          </div>
+
+          <div class="context-window-gauge">
+            <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">
+              <span>Start of Context (Prompt Header)</span>
+              <span id="pos-indicator-label" style="color: var(--accent-cyan); font-weight: 700;">Gold Evidence in Middle</span>
+              <span>End of Context (User Query)</span>
+            </div>
+            <div class="context-bar" id="context-bar">
+              <div class="context-slot" id="slot-top">Passages 1-3</div>
+              <div class="context-slot gold-slot" id="slot-middle">Gold Evidence</div>
+              <div class="context-slot" id="slot-bottom">Passages 8-10</div>
+            </div>
+          </div>
+
+          <div class="noise-metrics-grid" style="margin-top: 12px;">
+            <div class="noise-metric-card">
+              <div class="metric-label">GPT-4o Middle Accuracy</div>
+              <div class="metric-val" id="pos-val-4o" style="color: var(--accent-cyan);">91.7%</div>
+              <div class="metric-sub">LIM Penalty: 7.5 pts</div>
+            </div>
+            <div class="noise-metric-card">
+              <div class="metric-label">GPT-4o-mini Middle Accuracy</div>
+              <div class="metric-val" id="pos-val-mini" style="color: var(--accent-rose);">68.3%</div>
+              <div class="metric-sub">LIM Penalty: 20.8 pts (Severe)</div>
+            </div>
+            <div class="noise-metric-card">
+              <div class="metric-label">Middle Position Drop</div>
+              <div class="metric-val" id="pos-drop-mini" style="color: var(--accent-amber);">-25.0 pts</div>
+              <div class="metric-sub">Drop from Top (93.3% &rarr; 68.3%)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3.3 Knowledge Conflict Simulator -->
+        <div class="conflict-lab">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <h4 style="font-size: 15px; font-weight: 700;">Knowledge Conflict & Precedence Dynamics</h4>
+              <div style="font-size: 13px; color: var(--text-secondary);">Evaluate model resolution when retrieved passages present contradictory facts:</div>
+            </div>
+            <div class="pill-group">
+              <button class="pill-btn conflict-btn active" data-kind="dated">Dated Supersession</button>
+              <button class="pill-btn conflict-btn" data-kind="authority">Draft vs Official</button>
+              <button class="pill-btn conflict-btn" data-kind="unresolvable">Unresolvable</button>
+            </div>
+          </div>
+
+          <div class="noise-metrics-grid" style="margin-top: 14px;">
+            <div class="noise-metric-card">
+              <div class="metric-label">Governing Rule</div>
+              <div class="metric-val" id="conflict-rule" style="font-size: 16px; color: var(--accent-cyan);">Rule R3: Newer Date Wins</div>
+              <div class="metric-sub" id="conflict-rule-desc">Official passage with newer effective date supersedes older official passage.</div>
+            </div>
+            <div class="noise-metric-card">
+              <div class="metric-label">GPT-4o Resolution</div>
+              <div class="metric-val" id="conflict-acc-4o" style="color: var(--accent-emerald);">87.5%</div>
+              <div class="metric-sub" id="conflict-sub-4o">Stale Adoption: 12.5%</div>
+            </div>
+            <div class="noise-metric-card">
+              <div class="metric-label">GPT-4o-mini Resolution</div>
+              <div class="metric-val" id="conflict-acc-mini" style="color: var(--accent-rose);">67.5%</div>
+              <div class="metric-sub" id="conflict-sub-mini">Stale Adoption: 32.5%</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Section 4: Live Item & Trace Inspector -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Live Item & Trace Inspector</h2>
+        <div class="section-desc">Select benchmark queries to inspect actual synthesized context passages, opaque doc IDs, model tool calls, and failure taxonomy attribution.</div>
+      </div>
+
+      <div class="inspector-layout">
+        <div class="trace-nav" id="trace-nav">
+          <!-- Dynamically populated from web/data.js -->
+        </div>
+
+        <div class="trace-display" id="trace-display">
+          <!-- Dynamically populated from web/data.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Mitigation Interventions -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Evaluating Proposed RAG Mitigations</h2>
+        <div class="section-desc">Testing pluggable interventions on identical benchmark queries to evaluate the trade-off between hallucination reduction and false abstentions.</div>
+      </div>
+
+      <div class="card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Intervention</th>
+              <th>Architectural Mechanism</th>
+              <th>Accuracy Delta</th>
+              <th>Hallucination Delta</th>
+              <th>False Abstain Delta</th>
+              <th>Paired p-value</th>
+            </tr>
+          </thead>
+          <tbody id="intervention-table-body">
+            <!-- Dynamically populated from web/data.js -->
+          </tbody>
+        </table>
+
+        <div style="margin-top: 18px; font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+          <strong>The Precision-Recall Trade-off:</strong> Adding explicit inspection directives (<code>check_prompt</code>) or retrieval score thresholds (<code>score_threshold</code>) successfully suppresses hallucinations (-3.2% to -4.5%). However, they induce conservative false abstentions (+4.1% to +5.6%) on answerable queries with subtle evidence.
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div>
+        <span>RAG-Stress Engine | Built with Standard Library & Pure Web</span>
+      </div>
+      <div>
+        <span>Commit: <code>8c2456c</code> | Seed: <code>42</code> | Offline Cassettes: 2,356</span>
+      </div>
+    </footer>
+
+  </main>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+

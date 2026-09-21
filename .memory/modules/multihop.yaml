@@ -15,3 +15,4 @@ invariants:
   - "Multi-hop context building in Mode A requires injecting both primary gold and gold_bridge passages into ctx.gold_support_ids."
   - "In Mode B retrieval, gold support requires retrieving both hop passages; partial retrieval (1/2) yields retrieval_recall=0.5 and classifies failure as retrieval_miss."
   - "Grading requires citing both passages; single-hop citation yields citation_recall=0.5 and pass_strict=False."
+

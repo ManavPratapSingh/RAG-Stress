@@ -5,7 +5,7 @@ PYTEST ?= $(VENV)/bin/pytest
 RUFF ?= $(VENV)/bin/ruff
 MYPY ?= $(VENV)/bin/mypy
 
-.PHONY: help setup test lint format typecheck gen-kb validate bench-replay bench report docker
+.PHONY: help setup test lint format typecheck gen-kb validate bench-replay bench report docker web
 
 help:
 	@echo "Available commands:"
@@ -20,6 +20,7 @@ help:
 	@echo "  make bench         Run live/scripted benchmark on smoke suite"
 	@echo "  make report        Generate report for runs/latest"
 	@echo "  make docker        Build non-root Docker container"
+	@echo "  make web           Serve interactive frontend workbench locally"
 
 setup:
 	$(PIP) install -e ".[dev]"
@@ -56,3 +57,7 @@ report:
 
 docker:
 	docker build -t ragstress:latest .
+
+web:
+	@echo "Serving RAG-Stress Workbench at http://localhost:8000"
+	$(PYTHON) -m http.server -d web 8000

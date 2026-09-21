@@ -57,12 +57,24 @@ flowchart TD
     ContextModeB --> Interventions
     Interventions --> ModelAdapter
     ModelAdapter --> Evaluation
-    Evaluation --> Report
 ```
 
 ---
 
-## 2. Headline Benchmark Results (`core` suite, 1,120 items)
+## 2. Interactive Frontend & Benchmark Explorer
+
+An interactive, zero-dependency engineering workbench is available in [`web/`](web/) and can be hosted via GitHub Pages:
+- **Live GitHub Pages:** Automated deployment via `.github/workflows/pages.yml`.
+- **Local Preview:** Open `web/index.html` in any browser, or run `python -m http.server -d web 8000`.
+- **Key Interactive Features:**
+  - **Head-to-Head Frontier Benchmark:** Real 1,120-item evaluation comparing GPT-4o vs GPT-4o-mini with 95% Wilson confidence intervals.
+  - **McNemar Matrix:** Live interactive $2 \times 2$ discordance matrix showing statistically significant superiority ($b=37, c=189, p < 0.0001$).
+  - **Interactive Stress Laboratory:** Real-time SVG degradation curve, Lost-in-the-Middle context position tester, and knowledge conflict simulator.
+  - **Trace Inspector:** Inspect actual synthetic passages with opaque doc IDs, model outputs, citation precision/recall, and failure taxonomy attribution.
+
+---
+
+## 3. Headline Benchmark Results (`core` suite, 1,120 items)
 
 Evaluated under zero-network offline cassette replay on the standard `core` suite (1,120 items).
 
