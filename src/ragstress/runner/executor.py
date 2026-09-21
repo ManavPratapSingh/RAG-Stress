@@ -58,11 +58,15 @@ def _evaluate_single_item(
             item_id=item.item_id,
         )
         gold_support_ids = ctx.gold_support_ids
-        item_kind = (
-            "unanswerable"
-            if not condition.answerable
-            else (condition.conflict if condition.conflict != "none" else "answerable_plain")
-        )
+        q_support = getattr(q, "gold_support_fact_ids", None)
+        if q_support and len(q_support) > 1:
+            item_kind = "multihop"
+        else:
+            item_kind = (
+                "unanswerable"
+                if not condition.answerable
+                else (condition.conflict if condition.conflict != "none" else "answerable_plain")
+            )
         twin_entry = next((lbl for lbl in ctx.labels if lbl.get("role") == "twin"), None)
         twin_val = (
             twin_entry["facts"][0]["value"] if twin_entry and twin_entry.get("facts") else None
@@ -84,12 +88,21 @@ def _evaluate_single_item(
         ]
 
         # Target gold docs
-        gold_doc = next(
-            (p for p in kb.passages if any(f.fact_id == q.gold_fact_id for f in p.facts)),
-            None,
-        )
-        gold_support_ids = [gold_doc.doc_id] if gold_doc and condition.answerable else []
-        item_kind = "answerable_plain" if condition.answerable else "unanswerable"
+        q_support = getattr(q, "gold_support_fact_ids", None)
+        if q_support and len(q_support) > 1:
+            support_fact_ids = set(q_support)
+            gold_docs = [
+                p for p in kb.passages if any(f.fact_id in support_fact_ids for f in p.facts)
+            ]
+            gold_support_ids = [p.doc_id for p in gold_docs] if condition.answerable else []
+            item_kind = "multihop" if condition.answerable else "unanswerable"
+        else:
+            gold_doc = next(
+                (p for p in kb.passages if any(f.fact_id == q.gold_fact_id for f in p.facts)),
+                None,
+            )
+            gold_support_ids = [gold_doc.doc_id] if gold_doc and condition.answerable else []
+            item_kind = "answerable_plain" if condition.answerable else "unanswerable"
 
         # Map retrieved passages
         p_map = {p.doc_id: p for p in kb.passages}

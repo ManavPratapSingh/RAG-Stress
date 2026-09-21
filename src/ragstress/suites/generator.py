@@ -32,6 +32,39 @@ def generate_suite(
     is_smoke = name == "smoke"
     items: list[SuiteItem] = []
 
+    if name == "multihop":
+        from ragstress.multihop.generator import generate_multihop_questions
+
+        mh_qs = generate_multihop_questions(kb, seed=seed, count=20)
+        existing_ids = {q.question_id for q in kb.questions}
+        for mq in mh_qs:
+            if mq.question_id not in existing_ids:
+                kb.questions.append(mq)
+
+        for i, mq in enumerate(mh_qs):
+            split = _assign_split(mq.question_id)
+            cond_mode: Literal["A", "B"] = "B" if (i % 4 == 3) else "A"
+            k_n = 0 if (i % 4 == 0) else (5 if (i % 4 == 1) else 10)
+            items.append(
+                SuiteItem(
+                    item_id=f"multihop-{i:04d}-{cond_mode.lower()}-k{k_n if cond_mode == 'A' else 5}",
+                    split=split,
+                    group="multihop",
+                    question_id=mq.question_id,
+                    seed=rng.randint(0, 2**31 - 1),
+                    condition=StressCondition(
+                        k_noise=k_n if cond_mode == "A" else 0,
+                        position="random",
+                        conflict="none",
+                        answerable=True,
+                        mode=cond_mode,
+                        k_retrieve=5,
+                    ),
+                )
+            )
+        items.sort(key=lambda it: it.item_id)
+        return items
+
     # 1. Controls: Oracle (k=0, answerable) & Closed-book (k=0, unanswerable)
     n_ctrl = 4 if is_smoke else 60
     ctrl_indices = rng.sample(range(n_q), min(n_ctrl, n_q))

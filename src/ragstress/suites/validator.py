@@ -76,6 +76,8 @@ def validate_suite(items: list[SuiteItem], kb: BaseKB) -> SuiteValidationResult:
             item_kind = "unanswerable"
         elif it.condition.conflict != "none":
             item_kind = it.condition.conflict
+        elif getattr(q, "gold_support_fact_ids", None) and len(q.gold_support_fact_ids) > 1:
+            item_kind = "multihop"
         else:
             item_kind = "answerable_plain"
 

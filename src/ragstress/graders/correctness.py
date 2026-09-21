@@ -67,7 +67,7 @@ def grade_correctness(
     pass_answer = False
     pass_strict = False
 
-    if kind == "answerable_plain":
+    if kind in {"answerable_plain", "multihop", "plain"}:
         # normalized answer == gold, abstain = false
         if not output.abstain and norm_ans is not None and norm_ans == norm_gold_value:
             pass_answer = True

@@ -19,5 +19,10 @@
 - **Decision:** Implement `graders/normalize.py` during Phase 1 to satisfy and verify the render-normalize contract immediately.
 - **Alternatives Considered:** Mock normalizer in tests.
 - **Trade-offs:** Slightly more code upfront in Phase 1, but guarantees that Phase 1 outputs strictly conform to SPEC §8.1 before downstream phases rely on them.
+### D-010 Multi-Hop 2-Document Ground-Truth Composition
+- **Context:** PLAN.md Phase 9 Stretch goal calls for a multi-hop reasoning stress factor: composing 2 facts across 2 documents, requiring retrieval and citation of both documents.
+- **Decision:** Link client entities (products/facilities) to governing policy entities. Bridge statement is injected into Hop 1 passage ("{entity_name} is governed by {policy_name}") with bridge fact attribute "governing_policy". Hop 2 provides the target attribute. In Mode A, `gold_bridge` passage is injected into context and both passages are tagged in `gold_support_ids`. Mode B retrieval requires BM25 to rank both documents in top-k. Citation grader requires citing both passages (citation_recall = 0.5 if only one is cited, failing `pass_strict`).
+- **Alternatives Considered:** LLM-generated synthetic multi-hop chains or graph database traversal.
+- **Trade-offs:** Zero external dependencies; deterministic rule-based link ensures byte-identical reproducible ground truth.
 - **Status:** Active.
 

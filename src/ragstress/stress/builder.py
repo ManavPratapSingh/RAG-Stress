@@ -119,6 +119,13 @@ def build_context(
     else:
         primary_gold = gold_passage
 
+    # Handle multi-hop bridge passage
+    hop1_id = getattr(question, "hop1_passage_id", None)
+    if hop1_id:
+        hop1_doc = next((p for p in base_passages if p.doc_id == hop1_id), None)
+        if hop1_doc and hop1_doc.doc_id != primary_gold.doc_id:
+            others.append((hop1_doc, "gold_bridge"))
+
     # Generate distractors
     distractors = generate_distractor_passages(
         question=question,
@@ -163,6 +170,10 @@ def build_context(
         gold_values = [gold_fact.value]
         gold_support_ids = [p.doc_id for p in final_passages if p.role == "gold"]
         relevant_ids = [p.doc_id for p in final_passages if p.role in {"gold", "twin"}]
+    elif bool(getattr(question, "gold_support_fact_ids", None)):
+        gold_values = [gold_fact.value]
+        gold_support_ids = [p.doc_id for p in final_passages if p.role in {"gold", "gold_bridge"}]
+        relevant_ids = list(gold_support_ids)
     else:
         gold_values = [gold_fact.value]
         gold_support_ids = [p.doc_id for p in final_passages if p.role == "gold"]

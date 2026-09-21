@@ -1,0 +1,17 @@
+name: multihop
+path: src/ragstress/multihop/
+purpose: "2-document compositional reasoning stress factor generator and evaluation schemas."
+key_files:
+  - path: src/ragstress/multihop/schema.py
+    symbols:
+      - MultiHopQuestion
+    role: "Subclass of Question adding hop1_entity_id, hop2_entity_id, bridge_relation, gold_support_fact_ids, and passage IDs."
+  - path: src/ragstress/multihop/generator.py
+    symbols:
+      - generate_multihop_questions
+      - MULTIHOP_TEMPLATES
+    role: "Generates multi-hop questions linking client entities (products/facilities) to governing policy entities, injecting regulatory bridge facts into hop 1 passages."
+invariants:
+  - "Multi-hop context building in Mode A requires injecting both primary gold and gold_bridge passages into ctx.gold_support_ids."
+  - "In Mode B retrieval, gold support requires retrieving both hop passages; partial retrieval (1/2) yields retrieval_recall=0.5 and classifies failure as retrieval_miss."
+  - "Grading requires citing both passages; single-hop citation yields citation_recall=0.5 and pass_strict=False."

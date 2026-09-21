@@ -16,3 +16,4 @@ invariants:
   - "Interventions must evaluate on identical query items to allow valid paired McNemar and bootstrap difference tests."
   - "extra_system instructions are appended after the base prompt and must never modify ground-truth rules R1-R6."
   - "ScoreThresholdIntervention defaults to threshold=0.5 and forces abstain=True if max retrieval score in ctx.labels is below threshold."
+

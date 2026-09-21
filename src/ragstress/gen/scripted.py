@@ -42,7 +42,9 @@ class ScriptedGenerator:
                     citations=citations,
                 )
             else:
-                citations = [e["doc_id"] for e in gold_entries]
+                citations = [
+                    e["doc_id"] for e in labels if e.get("role") in {"gold", "gold_bridge"}
+                ]
                 output = GenOutput(
                     answer=self.gold_value,
                     abstain=False,

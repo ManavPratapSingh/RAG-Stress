@@ -40,3 +40,4 @@ USER appuser
 # Default command: show CLI help
 ENTRYPOINT ["ragstress"]
 CMD ["--help"]
+
