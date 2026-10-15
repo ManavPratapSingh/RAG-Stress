@@ -1,7 +1,7 @@
 // RAG-Stress Interactive Workbench Logic
 // Pure Vanilla JavaScript (Zero External Dependencies)
 
-document.addEventListener("DOMContentLoaded", () => {
+function init() {
   const data = window.RAG_DATA;
   if (!data) return;
 
@@ -473,11 +473,11 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
           <div class="result-row">
             <span>Pass Strict:</span>
-            <span style="color: ${res.pass_strict ? "var(--accent-emerald)" : "var(--accent-rose)}; font-weight:700;">${res.pass_strict ? "PASS" : "FAIL"}</span>
+            <span style="color: ${res.pass_strict ? "var(--accent-emerald)" : "var(--accent-rose)"}; font-weight:700;">${res.pass_strict ? "PASS" : "FAIL"}</span>
           </div>
           <div class="result-row">
             <span>Taxonomy:</span>
-            <span style="color: ${res.failure_mode ? "var(--accent-amber)" : "var(--accent-emerald)}; font-weight:600;">${res.failure_mode || "pass"}</span>
+            <span style="color: ${res.failure_mode ? "var(--accent-amber)" : "var(--accent-emerald)"}; font-weight:600;">${res.failure_mode || "pass"}</span>
           </div>
           <div class="result-note">${res.note}</div>
         </div>
@@ -550,4 +550,10 @@ document.addEventListener("DOMContentLoaded", () => {
   renderTraceNav();
   renderTraceDetail();
   initListeners();
-});
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
